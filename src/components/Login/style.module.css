@@ -1,0 +1,18 @@
+.login_form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6rem;
+}
+.gap {
+  margin-top: 10px;
+}
+.primary_btn {
+  background-color: red;
+  color: var(--color-primary);
+  border-radius: 20px;
+  width: 100%;
+  font-size: var(--fontsize-primary);
+  padding: 8px;
+}
