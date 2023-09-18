@@ -37,7 +37,13 @@ const RegisterForm: React.FC = () => {
     >
       <Grid item xs={12} sm={8} md={6} lg={4}>
         <Paper elevation={3} style={{ padding: "20px" }}>
-          <div style={{ justifyContent: "center", marginBottom: 20 }}>
+          <div
+            style={{
+              justifyContent: "center",
+              marginBottom: 20,
+              textAlign: "center",
+            }}
+          >
             <Image src={ryori} alt="ryori" width={300} height={90} />
           </div>
           <Typography variant="subtitle1">
@@ -126,7 +132,7 @@ const RegisterForm: React.FC = () => {
               required
               margin="normal"
             />
-            <Link href={""}>
+            <Link href={"/admin/createStore"}>
               <button className="button-primary">Sign up</button>
             </Link>
           </form>

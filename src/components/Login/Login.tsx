@@ -22,7 +22,7 @@ const LoginForm: React.FC = () => {
     >
       <Grid item xs={12} sm={8} md={6} lg={3}>
         <Paper elevation={3} style={{ padding: "20px" }}>
-          <div style={{ justifyContent: "center" }}>
+          <div style={{ textAlign: "center" }}>
             <Image src={ryori} alt="ryori" width={300} height={100} />
           </div>
           <Typography variant="subtitle1">
@@ -50,7 +50,7 @@ const LoginForm: React.FC = () => {
               />
             </div>
             <div className={style.gap}>
-              <Link href={""}>
+              <Link href={"/admin/dashboard"} prefetch={false}>
                 <button className="button-primary">Sign in</button>
               </Link>
             </div>
