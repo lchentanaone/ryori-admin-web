@@ -1,0 +1,70 @@
+.container {
+  /* background-color: var(--color-primary); */
+  background-color: "#FFFFFF";
+  padding-left: 25vh;
+  padding-right: 25vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.dashInfo {
+  font-family: "Quicksand", sans-serif;
+  background-color: var(--color-primary);
+  display: flex;
+  padding: 20px;
+  border-radius: 20px;
+}
+.sum_rev {
+  display: flex;
+  flex-direction: "row";
+  justify-content: space-around;
+}
+.dashBox {
+  font-family: "Quicksand", sans-serif;
+  margin-top: 30px;
+  height: 40vh;
+  width: 80vh;
+  border-radius: 20px;
+  box-shadow: 3px 3px 5px #8c8c8c, inset 0 0 10px rgba(255, 255, 255, 255.5);
+  padding: 20px;
+}
+.flex_row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.summaryInfo {
+  width: 160px;
+  justify-content: center;
+  display: flex;
+  padding: 25px;
+  border-radius: 10px;
+  flex-direction: column;
+  text-align: center;
+  color: #fff;
+}
+.mt {
+  margin-top: 20px;
+}
+.filter {
+  flex-direction: row;
+  display: flex;
+}
+.new {
+  background-color: #ff8f1f;
+}
+.preparing {
+  background-color: #4285f4;
+}
+.served {
+  background-color: #12bf38;
+}
+.waiting_payment {
+  background-color: #848f9a;
+}
+.done {
+  background-color: #12bf38;
+}
+.cancelled {
+  background-color: #777777;
+}

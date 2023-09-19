@@ -4,6 +4,7 @@ import Link from "next/link";
 import { TextField, Grid, Paper, Typography } from "@mui/material";
 import Image from "next/image";
 import ryori from "./../../../public/ryori-red.png";
+
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -50,7 +51,7 @@ const LoginForm: React.FC = () => {
               />
             </div>
             <div className={style.gap}>
-              <Link href={"/admin/dashboard"} prefetch={false}>
+              <Link href={"/admin/selectBranch"} prefetch={false}>
                 <button className="button-primary">Sign in</button>
               </Link>
             </div>

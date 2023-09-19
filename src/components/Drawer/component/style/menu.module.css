@@ -1,0 +1,51 @@
+.save_button {
+  padding: 10px 70px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: "Quicksand", sans-serif;
+}
+.btn_color_cancel {
+  color: #000;
+  background-color: #b1b1b1;
+}
+.btn_save_color {
+  color: white;
+  background-color: #12bf38;
+}
+.add_menu {
+  color: white;
+  background-color: #db1b1b;
+}
+.modal_btn {
+  display: "flex";
+  text-align: "center";
+  margin-top: 10px;
+  justify-content: "center";
+  gap: 20;
+}
+.uploadImg_menu {
+  color: white;
+  padding: 5px 40px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: "Quicksand", sans-serif;
+  background-color: #db1b1b;
+}
+.price {
+  background-color: red;
+  padding: 5px 10px;
+  width: 80px;
+  border-radius: 5px;
+  color: #fff;
+  font-family: "Quicksand", sans-serif;
+}
+.updateBtn {
+  padding: 5px 35px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: "Quicksand", sans-serif;
+}
