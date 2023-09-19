@@ -19,6 +19,7 @@
   font-size: var(--fontsize-primary);
   padding: 8px;
   border-width: 0px;
+  font-family: "Quicksand", sans-serif;
 }
 h1 {
   font-family: "Quicksand", sans-serif;

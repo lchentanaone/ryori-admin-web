@@ -17,6 +17,20 @@
   color: white;
   background-color: #db1b1b;
 }
+.add_inventory {
+  padding: 18px 70px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: "Quicksand", sans-serif;
+  margin-left: 10px;
+  color: white;
+  background-color: #4285f4;
+  transition: background-color 0.3s;
+}
+.add_inventory:hover {
+  background-color: #356ac3;
+}
 .modal_btn {
   display: "flex";
   text-align: "center";
@@ -48,4 +62,8 @@
   border-radius: 5px;
   cursor: pointer;
   font-family: "Quicksand", sans-serif;
+}
+.add_employee {
+  color: #fff;
+  background-color: #4285f4;
 }

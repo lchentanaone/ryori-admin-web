@@ -16,3 +16,12 @@
   width: 380px;
   font-family: "Quicksand", sans-serif;
 }
+.uploadImg_menu {
+  color: white;
+  padding: 5px 40px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: "Quicksand", sans-serif;
+  background-color: #db1b1b;
+}

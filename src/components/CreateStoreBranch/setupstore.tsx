@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { TextField, Button, Grid, Paper, Typography } from "@mui/material";
 import Link from "next/link";
-
+import style from "./style.module.css";
 const CreateStore: React.FC = () => {
   const [photo, setPhoto] = useState(null);
   // const [storeName, setStoreName] = useState("");
@@ -34,6 +34,13 @@ const CreateStore: React.FC = () => {
     const selectedFile = e.target.files[0];
     setPhoto(selectedFile);
   };
+  const hiddenFileInput = useRef<HTMLInputElement | null>(null);
+
+  const handleUpload = () => {
+    if (hiddenFileInput.current) {
+      hiddenFileInput.current.click();
+    }
+  };
 
   return (
     <Grid
@@ -54,19 +61,35 @@ const CreateStore: React.FC = () => {
             <Typography variant="h6" style={{ marginBottom: 20 }}>
               Set up your Store
             </Typography>
-            {photo && (
-              <div style={{ marginTop: 10 }}>
-                <img
-                  src={URL.createObjectURL(photo)}
-                  alt="Selected"
-                  width="150"
-                  height="160"
-                  style={{ borderRadius: 10 }}
-                />
-              </div>
-            )}
-            <label htmlFor="fileInput">Store Logo</label>
-            <input type="file" accept="image/*" onChange={handleFileChange} />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                textAlign: "center",
+              }}
+            >
+              {photo && (
+                <div style={{ marginTop: 10 }}>
+                  <img
+                    src={URL.createObjectURL(photo)}
+                    alt="Selected"
+                    width="170"
+                    height="200"
+                    style={{ borderRadius: 10 }}
+                  />
+                </div>
+              )}
+              <button className={style.uploadImg_menu} onClick={handleUpload}>
+                Upload Image
+              </button>
+              <input
+                type="file"
+                ref={hiddenFileInput}
+                style={{ display: "none" }}
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+            </div>
           </div>
           <form onSubmit={handleSubmit}>
             <TextField
