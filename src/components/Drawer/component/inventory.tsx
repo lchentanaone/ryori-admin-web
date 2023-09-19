@@ -126,7 +126,7 @@ export default function Inventory() {
           </FormControl>
         </div>
         <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
             <TableHead>
               <TableRow>
                 <TableCell>No.</TableCell>
