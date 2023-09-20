@@ -1,16 +1,57 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Grid, Paper, Typography } from "@mui/material";
 import style from "./style.module.css";
 
 const SelectBranch: React.FC = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [storeData, setStoreData] = useState(null);
+  const [branchData, setBranchData] = useState([]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Add your login logic here
+  const fetchStoreData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const store_Id = localStorage.getItem("store_Id");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/store/${store_Id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      setStoreData(data);
+      console.log({ data });
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   };
+  const fetchBranchData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const store_Id = localStorage.getItem("store_Id");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/branch/?store_Id=${store_Id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const branch = await response.json();
+      setBranchData(branch);
+      console.log({ branch });
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+  const init = async () => {
+    await fetchStoreData();
+    fetchBranchData();
+  };
+  useEffect(() => {
+    init();
+  }, []);
 
   return (
     <Grid
