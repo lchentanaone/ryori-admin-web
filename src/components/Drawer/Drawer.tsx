@@ -68,6 +68,7 @@ export default function TemporaryDrawer() {
           { text: "Archive Transaction", href: "/admin/archiveTrasaction" },
           { text: "Inventory", href: "/admin/inventory" },
           { text: "Store Setting", href: "/admin/storeInfo" },
+          { text: "QR Generator", href: "/admin/generateqr" },
           { text: "Employee", href: "/admin/employee" },
 
           { text: "Branches", href: "/admin/selectBranch" },
@@ -91,7 +92,9 @@ export default function TemporaryDrawer() {
     <div>
       {(["left"] as const).map((anchor) => (
         <React.Fragment key={anchor}>
-          <Button onClick={toggleDrawer(anchor, true)}>{anchor}</Button>
+          <Button onClick={toggleDrawer(anchor, true)}>
+            <MenuIcon style={{ fontSize: 35 }} />
+          </Button>
           <Drawer
             // variant="permanent"
             anchor={anchor}

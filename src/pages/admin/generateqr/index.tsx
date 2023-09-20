@@ -1,15 +1,15 @@
 import React from "react";
 import type { NextPage } from "next";
-import EmployeeTable from "@/components/Drawer/component/employee";
 import TemporaryDrawer from "@/components/Drawer/Drawer";
+import QRGenerator from "@/components/Drawer/component/generateQr";
 
-const EmployeePage: NextPage = () => {
+const QRGeneratorPage: NextPage = () => {
   return (
     <div>
       <TemporaryDrawer />
-      <EmployeeTable />
+      <QRGenerator />
     </div>
   );
 };
 
-export default EmployeePage;
+export default QRGeneratorPage;
