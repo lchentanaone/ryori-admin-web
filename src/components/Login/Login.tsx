@@ -6,12 +6,40 @@ import Image from "next/image";
 import ryori from "./../../../public/ryori-red.png";
 
 const LoginForm: React.FC = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Add your login logic here
+  };
+  const handleLogin = async () => {
+    console.log(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`);
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      }
+    );
+
+    if (response.ok) {
+      const jsonData = await response.json();
+      const token = jsonData.access_token;
+
+      // Store the token in localStorage
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", jsonData.role);
+      localStorage.setItem("userId", jsonData.userId);
+      window.location.href = "/admin/selectBranch";
+    } else {
+      setError("Invalid access token");
+      console.log({ error });
+    }
   };
 
   return (
@@ -50,10 +78,13 @@ const LoginForm: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
+            {error && <div className="error_message">{error}</div>}
             <div className={style.gap}>
-              <Link href={"/admin/selectBranch"} prefetch={false}>
-                <button className="button-primary">Sign in</button>
-              </Link>
+              {/* <Link href={"/admin/selectBranch"} prefetch={false}> */}
+              <button className="button-primary" onClick={handleLogin}>
+                Sign in
+              </button>
+              {/* </Link> */}
             </div>
             <div className={style.gap}>
               <Link href={"/admin/register"} prefetch={false}>

@@ -79,3 +79,7 @@ a {
   color: inherit;
   text-decoration: none;
 }
+.error_message {
+  color: red;
+  font-family: "Quicksand", sans-serif;
+}
