@@ -79,3 +79,23 @@
   margin-bottom: 10px;
   height: 40px;
 }
+.save_info {
+  padding: 10px 80px;
+  border: none;
+  border-radius: 5px;
+  width: 100%;
+  cursor: pointer;
+  font-family: "Quicksand", sans-serif;
+  color: white;
+  background-color: #db1b1b;
+}
+.green {
+  padding: 10px 80px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  font-family: "Quicksand", sans-serif;
+  color: white;
+  background-color: #4285f4;
+}
