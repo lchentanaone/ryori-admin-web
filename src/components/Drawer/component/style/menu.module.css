@@ -67,3 +67,15 @@
   color: #fff;
   background-color: #4285f4;
 }
+.image {
+  display: "flex";
+  text-align: "center";
+  justify-content: "center";
+  margin-top: 2px;
+  margin-left: 20px;
+  padding: 20;
+}
+.top {
+  margin-bottom: 10px;
+  height: 40px;
+}
