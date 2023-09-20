@@ -1,9 +1,11 @@
 import MenuCard from "@/components/Drawer/component/menu";
 import React from "react";
+import TemporaryDrawer from "@/components/Drawer/Drawer";
 
 const MenuPage: React.FC = () => {
   return (
     <div>
+      <TemporaryDrawer />
       <MenuCard />
     </div>
   );
