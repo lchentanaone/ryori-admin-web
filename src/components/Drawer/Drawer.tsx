@@ -8,8 +8,6 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import ArchiveIcon from "@mui/icons-material/Archive";
@@ -18,6 +16,10 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import PeopleIcon from "@mui/icons-material/People";
 import StoreIcon from "@mui/icons-material/Store";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import QrCode2Icon from "@mui/icons-material/QrCode2";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import FormatAlignCenterIcon from "@mui/icons-material/FormatAlignCenter";
 
 type Anchor = "left";
 
@@ -27,13 +29,17 @@ export default function TemporaryDrawer() {
   });
 
   const iconArray = [
-    <InboxIcon />,
-    <MailIcon />,
+    <DashboardIcon />,
     <MenuIcon />,
+    <AccountCircleIcon />,
+    <FormatAlignCenterIcon />,
+
     <ReceiptIcon />,
     <ArchiveIcon />,
     <InventoryIcon />,
     <SettingsIcon />,
+    <QrCode2Icon />,
+
     <PeopleIcon />,
     <StoreIcon />,
   ];
@@ -71,7 +77,6 @@ export default function TemporaryDrawer() {
           { text: "Store Setting", href: "/admin/storeInfo" },
           { text: "QR Generator", href: "/admin/generateqr" },
           { text: "Employee", href: "/admin/employee" },
-
           { text: "Branches", href: "/admin/selectBranch" },
         ].map((item, index) => (
           <ListItem sx={{ textAlign: "center" }} key={item.text}>
