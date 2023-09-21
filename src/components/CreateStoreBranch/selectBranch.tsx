@@ -3,9 +3,18 @@ import Link from "next/link";
 import { Grid, Paper, Typography } from "@mui/material";
 import style from "./style.module.css";
 
+interface Store_data {
+  _id: string;
+  storeName: string;
+}
+interface Branch_data {
+  _id: string;
+  branchName: string;
+}
+
 const SelectBranch: React.FC = () => {
-  const [storeData, setStoreData] = useState(null);
-  const [branchData, setBranchData] = useState([]);
+  const [storeData, setStoreData] = useState<Store_data>();
+  const [branchData, setBranchData] = useState<Branch_data[]>([]);
 
   const fetchStoreData = async () => {
     try {
@@ -23,7 +32,7 @@ const SelectBranch: React.FC = () => {
       setStoreData(data);
       console.log({ data });
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error("Error fetching store data:", error);
     }
   };
   const fetchBranchData = async () => {
@@ -40,11 +49,21 @@ const SelectBranch: React.FC = () => {
       );
       const branch = await response.json();
       setBranchData(branch);
-      console.log({ branch });
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error("Error fetching branch data:", error);
     }
   };
+
+  const handleBranchSelection = async (branch_Id: any) => {
+    try {
+      await localStorage.setItem("branch_Id", branch_Id);
+
+      window.location.href = "/admin/dashboard/";
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const init = async () => {
     await fetchStoreData();
     fetchBranchData();
@@ -62,13 +81,22 @@ const SelectBranch: React.FC = () => {
     >
       <Grid item xs={12} sm={8} md={6} lg={3}>
         <Paper elevation={3} style={{ padding: "20px", textAlign: "center" }}>
-          <Typography variant="h5">Mang Tomas Store</Typography>
+          <Typography variant="h5">
+            {storeData && storeData.storeName}
+          </Typography>
 
           <Typography variant="subtitle2">Select Branch</Typography>
-
-          <Link href={"/admin/dashboard"}>
-            <button className={style.branch_btn}>Mintal</button>
-          </Link>
+          {branchData.map((branch, index) => (
+            // <Link href={"/admin/dashboard?id=" + branch._id}>
+            <button
+              key={index}
+              className={style.branch_btn}
+              onClick={() => handleBranchSelection(branch._id)}
+            >
+              {branch.branchName}
+            </button>
+            // </Link>
+          ))}
           <Link href={"/admin/createStore"}>
             <button className={style.addbranch_btn}>Add new Branch</button>
           </Link>

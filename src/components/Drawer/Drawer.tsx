@@ -17,6 +17,7 @@ import InventoryIcon from "@mui/icons-material/Inventory";
 import SettingsIcon from "@mui/icons-material/Settings";
 import PeopleIcon from "@mui/icons-material/People";
 import StoreIcon from "@mui/icons-material/Store";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 type Anchor = "left";
 
@@ -93,7 +94,7 @@ export default function TemporaryDrawer() {
       {(["left"] as const).map((anchor) => (
         <React.Fragment key={anchor}>
           <Button onClick={toggleDrawer(anchor, true)}>
-            <MenuIcon style={{ fontSize: 35 }} />
+            <ArrowForwardIosIcon style={{ fontSize: 35, marginTop: "8px" }} />
           </Button>
           <Drawer
             // variant="permanent"

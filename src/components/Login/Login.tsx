@@ -10,10 +10,6 @@ const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Add your login logic here
-  };
   const handleLogin = async () => {
     console.log(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`);
     const response = await fetch(
@@ -34,7 +30,8 @@ const LoginForm: React.FC = () => {
       // Store the token in localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("role", jsonData.role);
-      localStorage.setItem("userId", jsonData.userId);
+      localStorage.setItem("user_Id", jsonData.user_Id);
+      localStorage.setItem("store_Id", jsonData.store_Id);
       window.location.href = "/admin/selectBranch";
     } else {
       setError("Invalid access token");
@@ -57,7 +54,7 @@ const LoginForm: React.FC = () => {
           <Typography variant="subtitle1">
             Please sign in to Continue
           </Typography>
-          <form onSubmit={handleSubmit}>
+          <div>
             <div className={style.gap}>
               <TextField
                 value={email}
@@ -91,7 +88,7 @@ const LoginForm: React.FC = () => {
                 <button className="button-primary">Create Account</button>
               </Link>
             </div>
-          </form>
+          </div>
         </Paper>
       </Grid>
     </Grid>
