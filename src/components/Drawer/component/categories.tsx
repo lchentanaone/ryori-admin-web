@@ -10,8 +10,7 @@ const Categories = () => {
       container
       justifyContent="center"
       alignItems="center"
-      //   height="80vh"
-      style={{ padding: 80 }}
+      style={{ paddingLeft: 80, paddingRight: 80 }}
     >
       <Grid item xs={12} style={{ marginBottom: 10 }}>
         <Typography variant="h5">Add Categories</Typography>

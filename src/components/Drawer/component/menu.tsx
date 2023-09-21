@@ -40,6 +40,7 @@ export default function MenuCard() {
   const [description, setDescription] = useState("");
   const [cookingTime, setCookingTime] = useState("");
   const [items, setItems] = useState<MenuData[]>([]);
+  const [selectedMenu, setSelectedMenu] = useState<MenuData>();
 
   const [categories, setCategories] = useState("");
   const [open, setOpen] = useState(false);
@@ -49,7 +50,7 @@ export default function MenuCard() {
 
   const fetchCategory = async () => {
     try {
-      const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("token");
       const store_Id = localStorage.getItem("store_Id");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/menuCategory/?store_Id=${store_Id}`,
@@ -71,7 +72,7 @@ export default function MenuCard() {
 
   const fetchMenu = async () => {
     try {
-      const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("token");
       const store_Id = localStorage.getItem("store_Id");
       const branch_Id = localStorage.getItem("branch_Id");
       const response = await fetch(
@@ -90,7 +91,6 @@ export default function MenuCard() {
       console.error(error);
     }
   };
-  const [selectedMenu, setSelectedMenu] = useState<MenuData>();
 
   const handleUpdate = (item: MenuData) => {
     setSelectedMenu(item);
