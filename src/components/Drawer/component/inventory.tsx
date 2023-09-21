@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { TextField, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -31,32 +31,184 @@ function createData(
   return { firstName, lastName, email, username, role, phone };
 }
 
-const rows = [
-  createData("San", "Guko", "SanGuko", "SanGuko@gmail.com", "123", "Manager"),
-  createData("San", "Guko", "SanGuko", "SanGuko@gmail.com", "123", "Manager"),
-];
-const style = {
-  position: "absolute" as "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 850,
-  bgcolor: "background.paper",
-  // border: "2px solid #000",
-  // boxShadow: 24,
-  p: 4,
-};
+interface Category {
+  _id: string;
+  title: string;
+}
+interface Category {
+  _id: string;
+  item: string;
+  weight: string;
+  quantity: string;
+  branch_Id: string;
+  readyQty: number;
+  wasteQty: number;
+  date: number;
+  categories: string;
+}
+
 export default function Inventory() {
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
   const [item, setItem] = useState("");
   const [filter, setFilter] = useState("");
   const [weight, setWeight] = useState("");
   const [quantity, setQuantity] = useState("");
-  const [category, setCategory] = useState("");
+  const [itemOnEdit, setItemOnEdit] = useState("");
+  const [category, setCategory] = useState<Category[]>([]);
+  const [inventory, setInventory] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+
+  const fetchCategory = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const branch_Id = localStorage.getItem("branch_Id");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/inventory/rawcategory/?branch_Id=${branch_Id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const responseData = await response.json();
+      setCategory(responseData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchItems = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const branch_Id = localStorage.getItem("branch_Id");
+      console.log({ token, branch_Id });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/inventory/rawgrocery/?branch_Id=${branch_Id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const responseData = await response.json();
+      console.log({ responseData });
+      setInventory(responseData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const addCategory = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const branch_Id = localStorage.getItem("branch_Id");
+      const user_Id = localStorage.getItem("user_Id");
+
+      if (itemOnEdit) {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/inventory/rawgrocery/${itemOnEdit}`,
+          {
+            method: "PATCH",
+            body: JSON.stringify({
+              item,
+              weight,
+              quantity,
+              branch_Id,
+              user_Id,
+              rawCategory_Id: selectedCategory,
+            }),
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (response.ok) {
+          fetchItems();
+          const responseData = await response.json();
+          if (Array.isArray(responseData)) {
+            fetchCategory();
+            setCategory(responseData);
+          }
+        } else {
+          console.error("Failed to add category");
+        }
+      } else {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/inventory/rawgrocery`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              item,
+              weight,
+              quantity,
+              branch_Id,
+              user_Id,
+              rawCategory_Id: selectedCategory,
+            }),
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (response.ok) {
+          fetchItems();
+
+          const responseData = await response.json();
+          console.log(responseData);
+        } else {
+          // Handle error
+          console.error("Failed to add item.");
+        }
+      }
+      setItemOnEdit("");
+      setItem("");
+      setWeight("");
+      setQuantity("");
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const handleEdit = (row: any) => {
+    setItemOnEdit(row._id);
+    setItem(row.item);
+    setWeight(row.weight);
+    setQuantity(row.quantity);
+    console.log(row._id);
+  };
+
+  const deleteItem = async (_id: string) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/inventory/rawgrocery/${_id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete category");
+      }
+      fetchItems();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategory();
+    fetchItems();
+  }, []);
+
   const handleChange = (event: SelectChangeEvent) => {
-    setCategory(event.target.value);
+    // setCategories(event.target.value);
     setFilter(event.target.value);
   };
   const handleFilter = (event: SelectChangeEvent) => {
@@ -72,14 +224,21 @@ export default function Inventory() {
             <InputLabel id="demo-simple-select-helper-label">
               Category
             </InputLabel>
+
             <Select
               labelId="demo-simple-select-helper-label"
               id="demo-simple-select-helper"
-              value={category}
+              // value={dropdownized(categories)}
+              // value={categories}
+              value={selectedCategory}
               label="Category"
-              onChange={handleChange}
+              onChange={(e) => setSelectedCategory(e.target.value)}
             >
-              <MenuItem value={10}>Chicken</MenuItem>
+              {category.map((item) => (
+                <MenuItem key={item._id} value={item._id}>
+                  {item.title}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
           <TextField
@@ -107,7 +266,9 @@ export default function Inventory() {
             onChange={(e) => setQuantity(e.target.value)}
             style={{ marginLeft: 10 }}
           />
-          <button className={` ${styles.add_inventory}`}>Save</button>
+          <button onClick={addCategory} className={` ${styles.add_inventory}`}>
+            Save
+          </button>
         </div>
         {/* --- */}
         <div style={{ marginBottom: 10 }}>
@@ -125,8 +286,12 @@ export default function Inventory() {
             </Select>
           </FormControl>
         </div>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+        <TableContainer component={Paper} style={{ marginBottom: 10 }}>
+          <Table
+            sx={{ minWidth: 650, maxHeight: 300 }}
+            size="small"
+            aria-label="a dense table"
+          >
             <TableHead>
               <TableRow>
                 <TableCell>No.</TableCell>
@@ -139,35 +304,47 @@ export default function Inventory() {
                 <TableCell>Action</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {rows.map((row) => (
+            {inventory.map((row, index) => (
+              <TableBody key={index}>
                 <TableRow
-                  key={row.firstName}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  sx={{
+                    "&:last-child td, &:last-child th": {
+                      borderBottom: 1,
+                      borderColor: "gray",
+                    },
+                  }}
                 >
                   <TableCell component="th" scope="row">
-                    {row.lastName}
+                    {index + 1}
                   </TableCell>
-                  <TableCell>{row.username}</TableCell>
-                  <TableCell>{row.email}</TableCell>
-                  <TableCell>{row.phone}</TableCell>
-                  <TableCell>{row.role}</TableCell>
-                  <TableCell>{row.role}</TableCell>
-                  <TableCell>{row.role}</TableCell>
+                  <TableCell component="th" scope="row">
+                    {row.item}
+                  </TableCell>
+                  <TableCell>{row.weight}</TableCell>
+                  <TableCell>{row.quantity}</TableCell>
+                  <TableCell>{row.readyQty}</TableCell>
+                  <TableCell>{row.wasteQty}</TableCell>
+                  <TableCell>{row.date}</TableCell>
                   <TableCell>
                     <IconButton aria-label="arrow">
                       <KeyboardArrowUpIcon />
                     </IconButton>
-                    <IconButton aria-label="pencil">
+                    <IconButton
+                      aria-label="pencil"
+                      onClick={() => handleEdit(row)}
+                    >
                       <BorderColorIcon />
                     </IconButton>
-                    <IconButton aria-label="delete">
+                    <IconButton
+                      aria-label="delete"
+                      onClick={() => deleteItem(row._id)}
+                    >
                       <DeleteIcon style={{ color: "red" }} />
                     </IconButton>
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
+              </TableBody>
+            ))}
           </Table>
         </TableContainer>
       </div>
