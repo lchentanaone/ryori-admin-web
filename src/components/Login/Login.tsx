@@ -26,8 +26,6 @@ const LoginForm: React.FC = () => {
     if (response.ok) {
       const jsonData = await response.json();
       const token = jsonData.access_token;
-
-      // Store the token in localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("role", jsonData.role);
       localStorage.setItem("user_Id", jsonData.user_Id);

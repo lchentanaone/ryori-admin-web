@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -20,10 +20,18 @@ const style = {
   transform: "translate(-50%, -50%)",
   width: 900,
   bgcolor: "background.paper",
-  // border: "2px solid #000",
-  // boxShadow: 24,
+  borderRadius: 1,
+  boxShadow: 24,
   p: 4,
 };
+
+interface MenuData {
+  _id: string;
+  title: string;
+  price: string;
+  description: string;
+  photo: any;
+}
 
 export default function MenuCard() {
   const [title, setTitle] = useState("");
@@ -31,12 +39,67 @@ export default function MenuCard() {
   const [qty, setQty] = useState(1);
   const [description, setDescription] = useState("");
   const [cookingTime, setCookingTime] = useState("");
+  const [items, setItems] = useState<MenuData[]>([]);
 
   const [categories, setCategories] = useState("");
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const [photo, setPhoto] = useState(null);
+
+  const fetchCategory = async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      const store_Id = localStorage.getItem("store_Id");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/menuCategory/?store_Id=${store_Id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      // const dropdownCategories = response.data.map((item) => ({
+      //   label: item.title,
+      //   value: item._id,
+      // }));
+      // setCategories(dropdownCategories);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchMenu = async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      const store_Id = localStorage.getItem("store_Id");
+      const branch_Id = localStorage.getItem("branch_Id");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/menuItem?store_Id=${store_Id}&branch_Id=${branch_Id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const responseData = await response.json();
+      console.log({ responseData });
+      setItems(responseData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const [selectedMenu, setSelectedMenu] = useState<MenuData>();
+
+  const handleUpdate = (item: MenuData) => {
+    setSelectedMenu(item);
+    setOpen(true);
+  };
+  useEffect(() => {
+    fetchCategory();
+    fetchMenu();
+  }, []);
 
   const handleChange = (event: SelectChangeEvent) => {
     setCategories(event.target.value);
@@ -80,60 +143,64 @@ export default function MenuCard() {
                 justifyContent: "space-around",
               }}
             >
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: 10 }}
-              >
-                <TextField
-                  value={title}
-                  id="outlined-basic"
-                  label="Title"
-                  variant="outlined"
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-                <TextField
-                  value={description}
-                  id="outlined-basic"
-                  label="Description"
-                  variant="outlined"
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-                <FormControl>
-                  <InputLabel id="demo-simple-select-helper-label">
-                    Category
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-helper-label"
-                    id="demo-simple-select-helper"
-                    value={categories}
-                    label="Category"
-                    onChange={handleChange}
-                  >
-                    <MenuItem value={10}>Chicken</MenuItem>
-                  </Select>
-                </FormControl>
+              {selectedMenu ? (
                 <div
-                  style={{
-                    display: "flex",
-                    textAlign: "center",
-                    marginTop: "10px",
-                    justifyContent: "center",
-                    gap: 20,
-                  }}
+                  style={{ display: "flex", flexDirection: "column", gap: 10 }}
                 >
-                  <button
-                    className={`${styles.save_button} ${styles.btn_save_color}`}
-                    onClick={handleClose}
+                  <TextField
+                    value={selectedMenu.title}
+                    id="outlined-basic"
+                    label="Title"
+                    variant="outlined"
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
+                  <TextField
+                    value={description}
+                    id="outlined-basic"
+                    label="Description"
+                    variant="outlined"
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
+                  <FormControl>
+                    <InputLabel id="demo-simple-select-helper-label">
+                      Category
+                    </InputLabel>
+                    <Select
+                      labelId="demo-simple-select-helper-label"
+                      id="demo-simple-select-helper"
+                      value={categories}
+                      label="Category"
+                      onChange={handleChange}
+                    >
+                      <MenuItem value={10}>Chicken</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <div
+                    style={{
+                      display: "flex",
+                      textAlign: "center",
+                      marginTop: "10px",
+                      justifyContent: "center",
+                      gap: 20,
+                    }}
                   >
-                    Save
-                  </button>
-                  <button
-                    className={`${styles.save_button} ${styles.btn_color_cancel}`}
-                    onClick={handleClose}
-                  >
-                    Cancel
-                  </button>
+                    <button
+                      className={`${styles.save_button} ${styles.btn_save_color}`}
+                      onClick={handleClose}
+                    >
+                      Save
+                    </button>
+                    <button
+                      className={`${styles.save_button} ${styles.btn_color_cancel}`}
+                      onClick={handleClose}
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div>Loading user data...</div>
+              )}
               <div
                 style={{
                   display: "flex",
@@ -206,54 +273,43 @@ export default function MenuCard() {
       </div>
       {/* --- */}
       <Box sx={{ gap: 4, display: "flex" }}>
-        <Card sx={{ maxWidth: 250, marginTop: 2, marginBottom: 2 }}>
-          <Image src={chicken} width={200} height={100} alt="img" />
-          <CardContent>
-            <Typography gutterBottom variant="h6" component="div">
-              Lizard
-            </Typography>
-            <p className={styles.price}>₱ {"9999"}</p>
-            <Typography variant="body2" color="text.secondary">
-              Lizards are a widespread group of squamate reptiles, with over
-              6,000 species, ranging across all continents except Antarctica
-            </Typography>
-          </CardContent>
-          <CardActions>
-            <button
-              className={`${styles.updateBtn} ${styles.btn_save_color}`}
-              onClick={handleOpen}
+        {items.length > 0 ? (
+          items.map((item, index) => (
+            <Card
+              key={index}
+              sx={{
+                maxWidth: 250,
+                maxHeight: 400,
+                marginTop: 2,
+                marginBottom: 2,
+              }}
             >
-              Update
-            </button>
-            <button className={`${styles.updateBtn} ${styles.add_menu}`}>
-              Delete
-            </button>
-          </CardActions>
-        </Card>
-        <Card sx={{ maxWidth: 250, marginTop: 2, marginBottom: 2 }}>
-          <Image src={chicken} width={200} height={100} alt="img" />
-          <CardContent>
-            <Typography gutterBottom variant="h6" component="div">
-              Lizard
-            </Typography>
-            <p className={styles.price}>₱ {"9999"}</p>
-            <Typography variant="body2" color="text.secondary">
-              Lizards are a widespread group of squamate reptiles, with over
-              6,000 species, ranging across all continents except Antarctica
-            </Typography>
-          </CardContent>
-          <CardActions>
-            <button
-              className={`${styles.updateBtn} ${styles.btn_save_color}`}
-              onClick={handleOpen}
-            >
-              Update
-            </button>
-            <button className={`${styles.updateBtn} ${styles.add_menu}`}>
-              Delete
-            </button>
-          </CardActions>
-        </Card>
+              <Image src={item.photo} width={200} height={100} alt="img" />
+              <CardContent>
+                <Typography gutterBottom variant="h6" component="div">
+                  {item.title}
+                </Typography>
+                <p className={styles.price}> ₱ {item.price}</p>
+                <Typography variant="body2" color="text.secondary">
+                  {item.description}
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <button
+                  className={`${styles.updateBtn} ${styles.btn_save_color}`}
+                  onClick={() => handleUpdate(item)}
+                >
+                  Update
+                </button>
+                <button className={`${styles.updateBtn} ${styles.add_menu}`}>
+                  Delete
+                </button>
+              </CardActions>
+            </Card>
+          ))
+        ) : (
+          <div>Loading</div>
+        )}
       </Box>
     </div>
   );
