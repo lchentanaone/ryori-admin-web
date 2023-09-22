@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { TextField, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -19,21 +19,15 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 
-function createData(
-  firstName: string,
-  lastName: string,
-  username: string,
-  email: string,
-  role: string,
-  phone: string
-) {
-  return { firstName, lastName, email, username, role, phone };
+interface Employee {
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  role: string;
+  phone: string;
 }
 
-const rows = [
-  createData("San", "Guko", "SanGuko", "SanGuko@gmail.com", "123", "Manager"),
-  createData("San", "Guko", "SanGuko", "SanGuko@gmail.com", "123", "Manager"),
-];
 const style = {
   position: "absolute" as "absolute",
   top: "50%",
@@ -57,9 +51,37 @@ export default function EmployeeTable() {
   const [confirmPasswor, setConfirmPassword] = useState("");
   const [role, setRole] = useState("");
   const [phone, setPhone] = useState("");
+  const [usersData, setUsersData] = useState<Employee[]>([]);
+
   const handleChange = (event: SelectChangeEvent) => {
     setRole(event.target.value);
   };
+
+  const fetchEmpoyee = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const branch_Id = localStorage.getItem("branch_Id");
+      console.log({ token, branch_Id });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user?branch_Id=${branch_Id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const responseData = await response.json();
+      console.log({ responseData });
+      setUsersData(responseData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  useEffect(() => {
+    fetchEmpoyee();
+  }, []);
+
   return (
     <>
       <div style={{ marginTop: 10, paddingLeft: 50, paddingRight: 50 }}>
@@ -199,7 +221,10 @@ export default function EmployeeTable() {
           </Modal>
         </div>
         {/* --- */}
-        <TableContainer component={Paper}>
+        <TableContainer
+          component={Paper}
+          sx={{ maxHeight: 700, marginBottom: 2 }}
+        >
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
@@ -212,19 +237,18 @@ export default function EmployeeTable() {
                 <TableCell>Action</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {rows.map((row) => (
+            {usersData.map((row, index) => (
+              <TableBody key={index}>
                 <TableRow
-                  key={row.firstName}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {row.lastName}
+                    {row.firstName}
                   </TableCell>
                   <TableCell>{row.username}</TableCell>
                   <TableCell>{row.email}</TableCell>
                   <TableCell>{row.phone}</TableCell>
-                  <TableCell>{row.role}</TableCell>
+                  <TableCell>{row.phone}</TableCell>
                   <TableCell>{row.role}</TableCell>
                   <TableCell>
                     <IconButton aria-label="user">
@@ -235,8 +259,8 @@ export default function EmployeeTable() {
                     </IconButton>
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
+              </TableBody>
+            ))}
           </Table>
         </TableContainer>
       </div>

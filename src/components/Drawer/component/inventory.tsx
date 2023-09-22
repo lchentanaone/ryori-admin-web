@@ -80,7 +80,6 @@ export default function Inventory() {
     try {
       const token = localStorage.getItem("token");
       const branch_Id = localStorage.getItem("branch_Id");
-      console.log({ token, branch_Id });
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/inventory/rawgrocery/?branch_Id=${branch_Id}`,
         {
@@ -91,7 +90,6 @@ export default function Inventory() {
       );
 
       const responseData = await response.json();
-      console.log({ responseData });
       setInventory(responseData);
     } catch (error) {
       console.error(error);
@@ -156,9 +154,7 @@ export default function Inventory() {
           fetchItems();
 
           const responseData = await response.json();
-          console.log(responseData);
         } else {
-          // Handle error
           console.error("Failed to add item.");
         }
       }
@@ -176,7 +172,6 @@ export default function Inventory() {
     setItem(row.item);
     setWeight(row.weight);
     setQuantity(row.quantity);
-    console.log(row._id);
   };
 
   const deleteItem = async (_id: string) => {
