@@ -16,14 +16,27 @@ interface Data {
 }
 
 const StoreInfo: React.FC = () => {
-  const [storeData, setStoreData] = useState<Data>();
+  const [storeData, setStoreData] = useState<Data>({
+    _id: "",
+    storeName: "",
+    branchName: "",
+    username: "",
+    email: "",
+    address: "",
+    contactNumber: "",
+    appId: "",
+    appSecret: "",
+    photo: "",
+  });
   const [photo, setPhoto] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  // const [storeName, setStoreName] = useState("");
-  // const [branchName, setBranchName] = useState("");
-  // const [email, setEmail] = useState("");
-  // const [address, setAddress] = useState("");
-  // const [contactNumber, setContactNumber] = useState("");
+  const [storeName, setStoreName] = useState("");
+  const [branchName, setBranchName] = useState("");
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
+  const [appId, setAppId] = useState("");
+  const [appSecret, setAppSecret] = useState("");
   const [formData, setFormData] = useState({
     storeName: "",
     branchName: "",
@@ -48,22 +61,29 @@ const StoreInfo: React.FC = () => {
           },
         }
       );
-      if (!response.ok) {
+      if (response.ok) {
+        const responseData = await response.json();
+        setStoreData({
+          storeName: responseData.storeName,
+          photo: responseData.photo,
+          appId: responseData.appId,
+          appSecret: responseData.appSecret,
+          branchName: responseData.branches[0].branchName,
+          email: responseData.branches[0].email,
+          contactNumber: responseData.branches[0].contactNumber,
+          address: responseData.branches[0].address,
+        });
+        setPhoto(responseData.photo);
+        // setStoreName(responseData.storeName);
+        // setAppId(responseData.appId);
+        // setAppSecret(responseData.appSecret);
+        // setBranchName(responseData.branches[0].branchName);
+        // setEmail(responseData.branches[0].email);
+        // setContactNumber(responseData.branches[0].contactNumber);
+        // setAddress(responseData.branches[0].address);
+      } else {
         throw new Error(`Request failed with status: ${response.status}`);
       }
-
-      const responseData = await response.json();
-
-      setStoreData({
-        storeName: responseData.storeName,
-        photo: responseData.photo,
-        appId: responseData.appId,
-        appSecret: responseData.appSecret,
-        branchName: responseData.branches[0].branchName,
-        email: responseData.branches[0].email,
-        contactNumber: responseData.branches[0].contactNumber,
-        address: responseData.branches[0].address,
-      });
     } catch (error) {
       console.error(error);
     }
@@ -72,24 +92,28 @@ const StoreInfo: React.FC = () => {
   useEffect(() => {
     fetchStoreData();
   }, []);
+  // const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = event.target;
+  //   setStoreData({ ...storeData, [name]: value });
+  // };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Add your registration logic here
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newEmail = event.target.value;
+    const newStoreName = event.target.value;
+    setStoreData({ ...storeData, email: newEmail, storeName: newStoreName });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const handleChangeText = (key: string | number, value: any) => {
+    const tempUserData = { ...storeData };
+    // tempUserData[key = value;
+    setStoreData(tempUserData);
   };
 
   const handleFileChange = (e: any) => {
     const selectedFile = e.target.files[0];
     setPhoto(selectedFile);
   };
+
   const hiddenFileInput = useRef<HTMLInputElement | null>(null);
 
   const handleUpload = () => {
@@ -143,7 +167,11 @@ const StoreInfo: React.FC = () => {
                   {photo && (
                     <div style={{ marginTop: 10 }}>
                       <img
-                        src={URL.createObjectURL(photo)}
+                        src={
+                          typeof photo === "string"
+                            ? photo
+                            : URL.createObjectURL(photo)
+                        }
                         alt="Selected"
                         width="170"
                         height="150"
@@ -179,7 +207,9 @@ const StoreInfo: React.FC = () => {
                       fullWidth
                       required
                       disabled={!isEditing}
-                      onChange={handleChange}
+                      onChange={(value) => {
+                        handleChangeText("storeName", value);
+                      }}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
