@@ -48,10 +48,13 @@ export default function EmployeeTable() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPasswor, setConfirmPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("");
   const [phone, setPhone] = useState("");
+
   const [usersData, setUsersData] = useState<Employee[]>([]);
+
+  const [error, setError] = useState("");
 
   const handleChange = (event: SelectChangeEvent) => {
     setRole(event.target.value);
@@ -78,6 +81,73 @@ export default function EmployeeTable() {
       console.error(error);
     }
   };
+
+  const handleRegister = async () => {
+    if (
+      !username ||
+      !firstName ||
+      !lastName ||
+      !email ||
+      !password ||
+      !phone ||
+      !confirmPassword
+    ) {
+      setError("All fields are required.");
+    } else if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+    } else if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+    } else {
+      setError("");
+      try {
+        const branch_Id = localStorage.getItem("branch_Id");
+        const store_Id = localStorage.getItem("store_Id");
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              firstName,
+              lastName,
+              username,
+              email,
+              role,
+              password,
+              phone,
+              branch_Id,
+              store_Id,
+            }),
+          }
+        );
+        console.log(response);
+        if (response.ok) {
+          fetchEmpoyee();
+          setUsername("");
+          setFirstname("");
+          setLastName("");
+          setEmail("");
+          setPassword("");
+          setConfirmPassword("");
+          setPhone("");
+          setRole("");
+          console.log("Success");
+        } else {
+          setError("Invalid Registration");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const addEmployee = () => {
+    handleClose();
+    handleRegister();
+  };
+
   useEffect(() => {
     fetchEmpoyee();
   }, []);
@@ -144,7 +214,9 @@ export default function EmployeeTable() {
                       label="Category"
                       onChange={handleChange}
                     >
-                      <MenuItem value={10}>Manager</MenuItem>
+                      <MenuItem value={"manager"}>Manager</MenuItem>
+                      <MenuItem value={"dining"}>Dining</MenuItem>
+                      <MenuItem value={"kitchen"}>Kitchen</MenuItem>
                     </Select>
                   </FormControl>
                   <TextField
@@ -172,13 +244,6 @@ export default function EmployeeTable() {
                     onChange={(e) => setLastName(e.target.value)}
                   />
                   <TextField
-                    value={phone}
-                    id="outlined-basic"
-                    label="Phone Number"
-                    variant="outlined"
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
-                  <TextField
                     value={email}
                     id="outlined-basic"
                     label="Email"
@@ -186,7 +251,15 @@ export default function EmployeeTable() {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                   <TextField
-                    value={confirmPasswor}
+                    value={phone}
+                    id="outlined-basic"
+                    label="Phone Number"
+                    variant="outlined"
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+
+                  <TextField
+                    value={confirmPassword}
                     id="outlined-basic"
                     type="password"
                     label="Confirm Password"
@@ -206,7 +279,7 @@ export default function EmployeeTable() {
               >
                 <button
                   className={`${styles.save_button} ${styles.btn_save_color}`}
-                  onClick={handleClose}
+                  onClick={addEmployee}
                 >
                   Save
                 </button>
@@ -237,19 +310,24 @@ export default function EmployeeTable() {
                 <TableCell>Action</TableCell>
               </TableRow>
             </TableHead>
-            {usersData.map((row, index) => (
+            {usersData.map((user, index) => (
               <TableBody key={index}>
                 <TableRow
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  sx={{
+                    "&:last-child td, &:last-child th": {
+                      border: 0,
+                      borderBottom: 1,
+                    },
+                  }}
                 >
                   <TableCell component="th" scope="row">
-                    {row.firstName}
+                    {user.firstName}
                   </TableCell>
-                  <TableCell>{row.username}</TableCell>
-                  <TableCell>{row.email}</TableCell>
-                  <TableCell>{row.phone}</TableCell>
-                  <TableCell>{row.phone}</TableCell>
-                  <TableCell>{row.role}</TableCell>
+                  <TableCell>{user.lastName}</TableCell>
+                  <TableCell>{user.username}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.phone}</TableCell>
+                  <TableCell>{user.role}</TableCell>
                   <TableCell>
                     <IconButton aria-label="user">
                       <ManageAccountsIcon />
