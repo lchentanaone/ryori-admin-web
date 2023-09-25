@@ -284,7 +284,7 @@ export default function MenuCard() {
                 marginBottom: 2,
               }}
             >
-              <Image src={item.photo} width={200} height={100} alt="img" />
+              <Image src={item.photo} width={200} height={100} alt="img" className={styles.menuImage} />
               <CardContent>
                 <Typography gutterBottom variant="h6" component="div">
                   {item.title}
