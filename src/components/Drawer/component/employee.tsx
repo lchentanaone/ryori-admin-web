@@ -83,6 +83,61 @@ export default function EmployeeTable() {
     }
   };
 
+  // TODO: Refactor so that register and update will be on 1 function which is save.
+  const updateEmployee = async () => {
+    if (
+      !username ||
+      !firstName ||
+      !lastName ||
+      !phone
+    ) {
+      setError("All fields are required.");
+    } else {
+      setError("");
+
+      try {
+        const token = localStorage.getItem("token");
+        const branch_Id = localStorage.getItem("branch_Id");
+        const store_Id = localStorage.getItem("store_Id");
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/user/${userOnEdit}`,
+          {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              firstName,
+              lastName,
+              username,
+              role,
+              phone,
+              branch_Id,
+              store_Id,
+            }),
+          }
+        );
+
+        if (response.ok) {
+          fetchEmpoyee();
+          console.log("Update Success");
+        } else {
+          setError("Invalid Registration");
+        }
+
+        setUsername("");
+        setFirstname("");
+        setLastName("");
+        setPhone("");
+        setRole("");
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }
+
   const handleRegister = async () => {
     if (
       !username ||
@@ -192,6 +247,7 @@ export default function EmployeeTable() {
       }
     }
   };
+  // TODO: rename addEmployee to like saveEmployee since this will handle editing and adding.
   const addEmployee = () => {
     // handleClose();
     // handleRegister();
@@ -217,6 +273,24 @@ export default function EmployeeTable() {
     }
   };
 
+  // TODO: Refactor so that addEmployee and EditEmployee are on the same function.
+  const editEmployee = () => {
+    if (
+      !username ||
+      !firstName ||
+      !lastName ||
+      !role ||
+      !phone
+    ) {
+      setError("All fields are required.");
+    } else {
+      setError("");
+      updateEmployee();
+      handleClose();
+    }
+  };
+
+  // TODO: Change this to selectEmployee because no edit is present here, this is just a function that selects the employee to be edited.
   const handleEdit = (user: any) => {
     setOpen(true);
     if (user) {
@@ -418,7 +492,7 @@ export default function EmployeeTable() {
               >
                 <button
                   className={`${styles.save_button} ${styles.btn_save_color}`}
-                  onClick={addEmployee}
+                  onClick={userOnEdit ? editEmployee : addEmployee}
                 >
                   Save
                 </button>
