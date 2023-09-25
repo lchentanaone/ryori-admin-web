@@ -78,7 +78,7 @@ const SelectBranch: React.FC = () => {
   }, []);
 
   return (
-    <>
+    <div>
       <Grid
         container
         justifyContent="center"
@@ -108,11 +108,11 @@ const SelectBranch: React.FC = () => {
             </Link>
           </Paper>
         </Grid>
-        <Grid style={{ marginTop: 100 }}>
+        <div style={{ marginTop: 20 }}>
           <button onClick={handleLogout}>Logout</button>
-        </Grid>
+        </div>
       </Grid>
-    </>
+    </div>
   );
 };
 
