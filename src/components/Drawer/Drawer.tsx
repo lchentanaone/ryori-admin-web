@@ -20,6 +20,7 @@ import QrCode2Icon from "@mui/icons-material/QrCode2";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import FormatAlignCenterIcon from "@mui/icons-material/FormatAlignCenter";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 type Anchor = "left";
 
@@ -27,6 +28,11 @@ export default function TemporaryDrawer() {
   const [state, setState] = React.useState({
     left: false,
   });
+
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = "/";
+  };
 
   const iconArray = [
     <DashboardIcon />,
@@ -90,6 +96,14 @@ export default function TemporaryDrawer() {
             </ListItemButton>
           </ListItem>
         ))}
+        <ListItem sx={{ textAlign: "center" }}>
+          <ListItemButton onClick={handleLogout}>
+            <ListItemIcon>
+              <ExitToAppIcon />
+            </ListItemIcon>
+            <ListItemText primary="Logout" sx={{ textAlign: "left" }} />
+          </ListItemButton>
+        </ListItem>
       </List>
     </Box>
   );
