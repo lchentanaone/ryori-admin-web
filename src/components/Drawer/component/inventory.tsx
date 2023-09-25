@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { TextField, Typography } from "@mui/material";
-import Box from "@mui/material/Box";
+import { Typography, TextField, Grid, Paper, Box, Button } from "@mui/material";
 import Modal from "@mui/material/Modal";
 import styles from "../component/style/menu.module.css";
 import InputLabel from "@mui/material/InputLabel";
@@ -16,7 +15,6 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 
@@ -56,6 +54,20 @@ export default function Inventory() {
   const [category, setCategory] = useState<Category[]>([]);
   const [inventory, setInventory] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [quantityLogs, setQuantityLogs] = useState(0);
+  const [errorTypeLog, setErrorTypeLog] = useState("");
+  const [type, setType] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const style = {
+    position: "absolute" as "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 500,
+    bgcolor: "background.paper",
+    p: 4,
+  };
 
   const fetchCategory = async () => {
     try {
@@ -167,6 +179,46 @@ export default function Inventory() {
     }
   };
 
+  const addQtyLogs = async () => {
+    if (!type) {
+      setErrorTypeLog("Type is required");
+    } else {
+      setErrorTypeLog("");
+      try {
+        const token = localStorage.getItem("token");
+        const user_Id = localStorage.getItem("user_Id");
+        const branch_Id = localStorage.getItem("branch_Id");
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/inventory/logs`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              type,
+              quantityLogs,
+              rawGrocery_Id: itemOnEdit,
+              user_Id,
+              branch_Id,
+            }),
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (response.ok) {
+          fetchItems();
+        } else {
+          throw new Error(`Request failed with status: ${response.status}`);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+      setOpen(false);
+      setType("");
+      setQuantityLogs(0);
+    }
+  };
+
   const handleEdit = (row: any) => {
     setItemOnEdit(row._id);
     setItem(row.item);
@@ -202,12 +254,28 @@ export default function Inventory() {
     fetchItems();
   }, []);
 
-  const handleChange = (event: SelectChangeEvent) => {
-    // setCategories(event.target.value);
-    setFilter(event.target.value);
+  const handleOpen = (row: any) => {
+    setOpen(true);
+    setItemOnEdit(row);
+    console.log({ row });
+  };
+
+  const handleType = (event: SelectChangeEvent) => {
+    setType(event.target.value);
   };
   const handleFilter = (event: SelectChangeEvent) => {
     setFilter(event.target.value);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleIncrease = () => {
+    setQuantityLogs(quantityLogs + 1);
+  };
+
+  const handleDecrease = () => {
+    setQuantityLogs(quantityLogs - 1);
   };
 
   return (
@@ -321,7 +389,10 @@ export default function Inventory() {
                   <TableCell>{row.wasteQty}</TableCell>
                   <TableCell>{row.date}</TableCell>
                   <TableCell>
-                    <IconButton aria-label="arrow">
+                    <IconButton
+                      onClick={() => handleOpen(row._id)}
+                      aria-label="arrow"
+                    >
                       <KeyboardArrowUpIcon />
                     </IconButton>
                     <IconButton
@@ -342,6 +413,66 @@ export default function Inventory() {
             ))}
           </Table>
         </TableContainer>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <h1>Change Password</h1>
+              <FormControl style={{ width: 200 }}>
+                <InputLabel style={{ marginTop: -5 }}>Type</InputLabel>
+                <Select
+                  labelId="inventory-logs"
+                  id="logs"
+                  value={type}
+                  label="Type"
+                  onChange={handleType}
+                >
+                  <MenuItem value={"ready"}>Ready</MenuItem>
+                  <MenuItem value={"waste"}>Waste</MenuItem>
+                </Select>
+              </FormControl>
+              <Grid
+                container
+                direction="row"
+                style={{ justifyContent: "center", gap: 10 }}
+              >
+                <Button variant="contained" onClick={handleDecrease}>
+                  -
+                </Button>
+                <TextField
+                  type="number"
+                  variant="outlined"
+                  value={quantityLogs}
+                  style={{ width: 100 }}
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                />
+                <Button variant="contained" onClick={handleIncrease}>
+                  +
+                </Button>
+              </Grid>
+              {errorTypeLog !== "" && (
+                <Typography variant="subtitle2" style={{ color: "#ff0000" }}>
+                  {errorTypeLog}
+                </Typography>
+              )}
+              <button onClick={addQtyLogs}>save</button>
+            </div>
+          </Box>
+        </Modal>
       </div>
     </>
   );
