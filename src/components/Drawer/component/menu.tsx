@@ -26,11 +26,20 @@ const style = {
 };
 
 interface MenuData {
-  _id: string;
-  title: string;
-  price: string;
-  description: string;
-  photo: any;
+  _id?: string;
+  title?: string;
+  price?: string;
+  description?: string;
+  photo?: any;
+  menuCategories?: string[];
+}
+interface iCategory {
+  title: string
+  _id: string
+}
+interface iCategoryDOM {
+  label: string
+  value: string
 }
 
 export default function MenuCard() {
@@ -42,7 +51,7 @@ export default function MenuCard() {
   const [items, setItems] = useState<MenuData[]>([]);
   const [selectedMenu, setSelectedMenu] = useState<MenuData>();
 
-  const [categories, setCategories] = useState("");
+  const [categories, setCategories] = useState<iCategoryDOM[]>();
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -60,11 +69,13 @@ export default function MenuCard() {
           },
         }
       );
-      // const dropdownCategories = response.data.map((item) => ({
-      //   label: item.title,
-      //   value: item._id,
-      // }));
-      // setCategories(dropdownCategories);
+      const _categories = await response.json();
+      const dropdownCategories = _categories.map((item:iCategory) => ({
+        label: item.title,
+        value: item._id,
+      }));
+
+      setCategories(dropdownCategories);
     } catch (error) {
       console.error(error);
     }
@@ -92,6 +103,7 @@ export default function MenuCard() {
     }
   };
 
+  // TODO: Rename this handleUpdate to a selectItem because no update is done here yet, just selecting which item to update.
   const handleUpdate = (item: MenuData) => {
     setSelectedMenu(item);
     setOpen(true);
@@ -102,7 +114,9 @@ export default function MenuCard() {
   }, []);
 
   const handleChange = (event: SelectChangeEvent) => {
-    setCategories(event.target.value);
+    const tmpSelectedMenu = {...selectedMenu}
+    tmpSelectedMenu.menuCategories = [event.target.value];
+    setSelectedMenu(tmpSelectedMenu)
   };
 
   const handleFileChange = (e: any) => {
@@ -168,11 +182,16 @@ export default function MenuCard() {
                     <Select
                       labelId="demo-simple-select-helper-label"
                       id="demo-simple-select-helper"
-                      value={categories}
+                      value={selectedMenu.menuCategories && selectedMenu.menuCategories[0]}
                       label="Category"
                       onChange={handleChange}
                     >
-                      <MenuItem value={10}>Chicken</MenuItem>
+                      {
+                      categories &&
+                      categories.length > 0 && 
+                      categories.map((category: iCategoryDOM, key:number) => (
+                        <MenuItem value={category.value}>{category.label}</MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                   <div
@@ -284,7 +303,7 @@ export default function MenuCard() {
                 marginBottom: 2,
               }}
             >
-              <Image src={item.photo} width={200} height={100} alt="img" />
+              <Image src={item.photo} width={200} height={100} alt="img" className={styles.menuImage} />
               <CardContent>
                 <Typography gutterBottom variant="h6" component="div">
                   {item.title}
