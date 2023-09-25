@@ -104,8 +104,10 @@ const StoreInfo: React.FC = () => {
   };
 
   const handleChangeText = (key: string | number, value: any) => {
-    const tempUserData = { ...storeData };
-    // tempUserData[key = value;
+    const tempUserData = { 
+      ...storeData,
+      [key]: value
+    };
     setStoreData(tempUserData);
   };
 
@@ -207,8 +209,9 @@ const StoreInfo: React.FC = () => {
                       fullWidth
                       required
                       disabled={!isEditing}
-                      onChange={(value) => {
-                        handleChangeText("storeName", value);
+                      name="storeName"
+                      onChange={(e) => {
+                        handleChangeText("storeName", e.target.value);
                       }}
                     />
                   </Grid>
