@@ -1,24 +1,159 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Typography, TextField, Grid, Paper, Box } from "@mui/material";
-import ryori from "./../../../../public/ryori.png";
+import avatar from "./../../../../public/avatar1.png";
 import Image from "next/image";
 import styles from "../component/style/menu.module.css";
 import Modal from "@mui/material/Modal";
 
+interface Data {
+  _id: string;
+
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  phone: string;
+  address: string;
+  password: string;
+}
+
 const UserInfo = () => {
-  const [username, setUsername] = useState("");
-  const [firstName, setFirtName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [address, setAddress] = useState("");
-  const [phon, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [userData, setUserData] = useState<Data>({
+    _id: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    address: "",
+    phone: "",
+    username: "",
+    password: "",
+  });
 
   const [isEditing, setIsEditing] = useState(false);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+
+  const [errors, setErrors] = useState("");
+
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user/profile`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.ok) {
+        const responseData = await response.json();
+        setUserData(responseData);
+        console.log({ responseData });
+      } else {
+        throw new Error(`Request failed with status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const updateUser = async () => {
+    if (!userData.firstName) {
+      setErrors("First Name is required.");
+    } else if (!userData.lastName) {
+      setErrors("Last Name is required.");
+    } else if (!userData.username) {
+      setErrors("Username is required.");
+    } else {
+      setErrors("");
+      try {
+        const userId = localStorage.getItem("user_Id");
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/user/${userId}`,
+          {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              username: userData.username,
+              phone: userData.phone,
+            }),
+          }
+        );
+        if (response.ok) {
+          fetchUserData();
+          setIsEditing(false);
+        } else {
+          throw new Error(`Request failed with status: ${response.status}`);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
+  const updateUserCred = async () => {
+    if (!password || !confirmPassword) {
+      setErrors("All fields are required.");
+    } else if (password.length < 6) {
+      setErrors("Password must be at least 6 characters.");
+    } else if (password !== confirmPassword) {
+      setErrors("Passwords do not match.");
+    } else {
+      setErrors("");
+      try {
+        const token = localStorage.getItem("token");
+        const user_Id = localStorage.getItem("user_Id");
+        const store_Id = localStorage.getItem("store_Id");
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/user/${user_Id}`,
+          {
+            method: "PATCH",
+            body: JSON.stringify({
+              store_Id,
+              password,
+            }),
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log({ response });
+        console.log({ password });
+        if (response.ok) {
+          fetchUserData();
+        } else {
+          throw new Error(`Request failed with status: ${response.status}`);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+      setOpen(false);
+      setPassword("");
+      setConfirmPassword("");
+    }
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleChangeText = (key: string | number, value: any) => {
+    const tempUserData = {
+      ...userData,
+      [key]: value,
+    };
+    setUserData(tempUserData);
+  };
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -39,6 +174,10 @@ const UserInfo = () => {
     p: 4,
   };
 
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
   return (
     <Grid container justifyContent="center" alignItems="center" height="100vh">
       <Paper elevation={3} style={{ padding: "80px", width: 800 }}>
@@ -52,102 +191,121 @@ const UserInfo = () => {
             paddingRight: 100,
           }}
         >
-          <form>
-            <Grid item xs={12} textAlign="center">
-              <Image src={ryori} alt="ryori" width={160} height={150} />
-            </Grid>
-            <Grid container spacing={2} style={{ marginTop: 20 }}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="First Name"
-                  variant="outlined"
-                  value={firstName}
-                  fullWidth
-                  required
-                  disabled={!isEditing}
-                  onChange={(e) => setFirtName(e.target.value)}
-                />
+          {userData ? (
+            <div>
+              <Grid item xs={12} textAlign="center">
+                <Image src={avatar} alt="ryori" width={160} height={150} />
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Last Name"
-                  variant="outlined"
-                  value={lastName}
-                  fullWidth
-                  required
-                  disabled={!isEditing}
-                  onChange={(e) => setLastName(e.target.value)}
-                />
+              <Grid container spacing={2} style={{ marginTop: 20 }}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="First Name"
+                    variant="outlined"
+                    value={userData.firstName}
+                    fullWidth
+                    required
+                    disabled={!isEditing}
+                    onChange={(e) => {
+                      handleChangeText("firstName", e.target.value);
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Last Name"
+                    variant="outlined"
+                    value={userData.lastName}
+                    fullWidth
+                    required
+                    disabled={!isEditing}
+                    onChange={(e) => {
+                      handleChangeText("lastName", e.target.value);
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Username"
+                    variant="outlined"
+                    value={userData.username}
+                    fullWidth
+                    required
+                    disabled={!isEditing}
+                    onChange={(e) => {
+                      handleChangeText("username", e.target.value);
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Email"
+                    variant="outlined"
+                    fullWidth
+                    value={userData.email}
+                    type="email"
+                    required
+                    disabled={true}
+                    onChange={(e) => {
+                      handleChangeText("email", e.target.value);
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Contact No."
+                    variant="outlined"
+                    value={userData.phone}
+                    fullWidth
+                    required
+                    disabled={!isEditing}
+                    onChange={(e) => {
+                      handleChangeText("phone", e.target.value);
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Address"
+                    variant="outlined"
+                    fullWidth
+                    multiline
+                    value={userData.address}
+                    rows={2}
+                    required
+                    disabled={!isEditing}
+                    onChange={(e) => {
+                      handleChangeText("address", e.target.value);
+                    }}
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Username"
-                  variant="outlined"
-                  value={username}
-                  fullWidth
-                  required
-                  disabled={!isEditing}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Email"
-                  variant="outlined"
-                  fullWidth
-                  value={email}
-                  type="email"
-                  required
-                  disabled={!isEditing}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Contact No."
-                  variant="outlined"
-                  value={phon}
-                  fullWidth
-                  required
-                  disabled={!isEditing}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Address"
-                  variant="outlined"
-                  fullWidth
-                  multiline
-                  value={address}
-                  rows={2}
-                  required
-                  disabled={!isEditing}
-                  onChange={(e) => setAddress(e.target.value)}
-                />
-              </Grid>
-            </Grid>
 
-            <Grid item xs={12} textAlign="center">
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <button
-                  onClick={isEditing ? handleUpdateClick : handleEditClick}
-                  className={
-                    isEditing ? `${styles.green}` : `${styles.save_info}`
-                  }
-                  style={{ marginTop: 10 }}
+              <Grid item xs={12} textAlign="center">
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
                 >
-                  {isEditing ? "Save" : "Edit"}
-                </button>
-              </div>
-            </Grid>
-          </form>
+                  {errors !== "" && (
+                    <div style={{ color: "#ff0000", top: -7 }}>{errors}</div>
+                  )}
+                  <button
+                    onClick={isEditing ? updateUser : handleEditClick}
+                    className={
+                      isEditing ? `${styles.green}` : `${styles.save_info}`
+                    }
+                    style={{ marginTop: 10 }}
+                  >
+                    {isEditing ? "Save" : "Edit"}
+                  </button>
+                </div>
+              </Grid>
+            </div>
+          ) : (
+            <div>Loading</div>
+          )}
           {!isEditing && (
             <button
               onClick={handleOpen}
@@ -186,8 +344,11 @@ const UserInfo = () => {
               required
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
+            {errors !== "" && (
+              <div style={{ color: "#ff0000", top: -7 }}>{errors}</div>
+            )}
             <button
-              onClick={handleClose}
+              onClick={updateUserCred}
               className={`${styles.save_info}`}
               style={{ marginTop: 10 }}
             >

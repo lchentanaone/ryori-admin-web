@@ -144,8 +144,7 @@ const Dashboard = () => {
           </thead>
           <tbody>
             <tr>
-              <td> 111</td>
-              {/* <td> {dashboard.totalMenus}</td> */}
+              <td> {dashboard && dashboard.totalMenus}</td>
               <td>{dashboard && dashboard.totalOrders}</td>
               <td>{dashboard && dashboard.totalCustomers}</td>
               <td> {dashboard && dashboard.totalRevenues}</td>
