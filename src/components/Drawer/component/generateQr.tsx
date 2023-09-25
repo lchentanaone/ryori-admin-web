@@ -4,9 +4,11 @@ import qrcode from "./../../../../public/qr.png";
 import Image from "next/image";
 import styles from "../component/style/menu.module.css";
 import Modal from "@mui/material/Modal";
+import { decrypt, encrypt } from "@/utils/utils";
 
 const QRGenerator = () => {
   const [table, setTable] = useState("");
+  const [qrString, setQrString] = useState<string>("");
 
   const [isEditing, setIsEditing] = useState(false);
   const [open, setOpen] = useState(false);
@@ -20,6 +22,17 @@ const QRGenerator = () => {
   const handleUpdateClick = () => {
     setIsEditing(false);
   };
+  const handleGenerateQrCode = async () => {
+    const store_Id = localStorage.getItem("store_Id");
+    const branch_Id = localStorage.getItem("branch_Id");
+    const originalStr = `id=${store_Id}&branch=${branch_Id}&table=${table}`
+
+    const request = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/encrypt/${originalStr}`)
+    const encryptedStr = await request.text()
+    const strToQr = `${process.env.NEXT_PUBLIC_RYORI_WEB_APP}?token=${encryptedStr}`
+    console.log({originalStr, encryptedStr, strToQr})
+    setQrString(strToQr)    
+  }
   const style = {
     position: "absolute" as "absolute",
     top: "50%",
@@ -47,7 +60,13 @@ const QRGenerator = () => {
         >
           <Typography variant="h5">Generate Table QR Code here</Typography>
           <Grid item xs={12} textAlign="center">
-            <Image src={qrcode} alt="ryori" width={300} height={300} />
+            {qrString && (
+              <Image width={300} height={300} 
+                alt="QR Code"
+                src={`https://chart.apis.google.com/chart?cht=qr&chs=248&chl=${qrString}`}
+              />
+            )}
+            {/* <Image src={qrcode} alt="ryori" width={300} height={300} /> */}
           </Grid>
           <Grid item xs={12}>
             <TextField
@@ -70,7 +89,7 @@ const QRGenerator = () => {
               }}
             >
               <button
-                onClick={isEditing ? handleUpdateClick : handleEditClick}
+                onClick={handleGenerateQrCode}
                 className={styles.green}
                 style={{ marginTop: 10 }}
               >
