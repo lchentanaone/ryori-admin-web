@@ -28,31 +28,22 @@ const StoreInfo: React.FC = () => {
     appSecret: "",
     photo: "",
   });
+
   const [photo, setPhoto] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [storeName, setStoreName] = useState("");
-  const [branchName, setBranchName] = useState("");
-  const [email, setEmail] = useState("");
-  const [address, setAddress] = useState("");
-  const [contactNumber, setContactNumber] = useState("");
-  const [appId, setAppId] = useState("");
-  const [appSecret, setAppSecret] = useState("");
-  const [formData, setFormData] = useState({
-    storeName: "",
-    branchName: "",
-    email: "",
-    address: "",
-    contactNumber: "",
-    appId: "",
-    appSecret: "",
-  });
+  // const [storeName, setStoreName] = useState("");
+  // const [branchName, setBranchName] = useState("");
+  // const [email, setEmail] = useState("");
+  // const [address, setAddress] = useState("");
+  // const [contactNumber, setContactNumber] = useState("");
+  // const [appId, setAppId] = useState("");
+  // const [appSecret, setAppSecret] = useState("");
 
   const fetchStoreData = async () => {
     try {
       const token = localStorage.getItem("token");
       const branch_Id = localStorage.getItem("branch_Id");
       const store_Id = localStorage.getItem("store_Id");
-      console.log({ token, branch_Id });
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/store/${store_Id}/${branch_Id}`,
         {
@@ -89,24 +80,48 @@ const StoreInfo: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchStoreData();
-  }, []);
-  // const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value } = event.target;
-  //   setStoreData({ ...storeData, [name]: value });
-  // };
+  const handleSubmit = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const store_Id = localStorage.getItem("store_Id");
+      const branch_Id = localStorage.getItem("branch_Id");
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newEmail = event.target.value;
-    const newStoreName = event.target.value;
-    setStoreData({ ...storeData, email: newEmail, storeName: newStoreName });
+      var formdata = new FormData();
+      formdata.append("storeName", storeData.storeName);
+      formdata.append("photo", photo || "");
+      formdata.append("appId", storeData.appId);
+      formdata.append("appSecret", storeData.appSecret);
+
+      formdata.append("branch_Id", branch_Id || "");
+      formdata.append("branchName", storeData.branchName);
+      formdata.append("contactNumber", storeData.contactNumber);
+      formdata.append("email", storeData.email);
+      formdata.append("address", storeData.address);
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/store/${store_Id}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formdata,
+        }
+      );
+      if (response.ok) {
+        fetchStoreData();
+      } else {
+        console.error("Failed to add item.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const handleChangeText = (key: string | number, value: any) => {
-    const tempUserData = { 
+    const tempUserData = {
       ...storeData,
-      [key]: value
+      [key]: value,
     };
     setStoreData(tempUserData);
   };
@@ -130,7 +145,12 @@ const StoreInfo: React.FC = () => {
 
   const handleUpdateClick = () => {
     setIsEditing(false);
+    handleSubmit();
   };
+
+  useEffect(() => {
+    fetchStoreData();
+  }, []);
 
   return (
     <Grid container justifyContent="center" alignItems="center" height="100vh">
@@ -223,7 +243,9 @@ const StoreInfo: React.FC = () => {
                       fullWidth
                       required
                       disabled={!isEditing}
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        handleChangeText("appId", e.target.value);
+                      }}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -234,7 +256,9 @@ const StoreInfo: React.FC = () => {
                       fullWidth
                       required
                       disabled={!isEditing}
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        handleChangeText("appSecret", e.target.value);
+                      }}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -245,7 +269,9 @@ const StoreInfo: React.FC = () => {
                       fullWidth
                       required
                       disabled={!isEditing}
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        handleChangeText("branchName", e.target.value);
+                      }}
                     />
                   </Grid>
 
@@ -258,7 +284,9 @@ const StoreInfo: React.FC = () => {
                       type="email"
                       required
                       disabled={!isEditing}
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        handleChangeText("contactNumber", e.target.value);
+                      }}
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -269,7 +297,9 @@ const StoreInfo: React.FC = () => {
                       fullWidth
                       required
                       disabled={!isEditing}
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        handleChangeText("email", e.target.value);
+                      }}
                     />
                   </Grid>
 
@@ -283,7 +313,9 @@ const StoreInfo: React.FC = () => {
                       rows={2}
                       required
                       disabled={!isEditing}
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        handleChangeText("address", e.target.value);
+                      }}
                     />
                   </Grid>
                 </Grid>
