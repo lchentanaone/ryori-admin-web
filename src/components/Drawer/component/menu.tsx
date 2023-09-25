@@ -26,12 +26,12 @@ const style = {
 };
 
 interface MenuData {
-  _id: string;
-  title: string;
-  price: string;
-  description: string;
-  photo: any;
-  menuCategories: string[];
+  _id?: string;
+  title?: string;
+  price?: string;
+  description?: string;
+  photo?: any;
+  menuCategories?: string[];
 }
 interface iCategory {
   title: string
@@ -103,6 +103,7 @@ export default function MenuCard() {
     }
   };
 
+  // TODO: Rename this handleUpdate to a selectItem because no update is done here yet, just selecting which item to update.
   const handleUpdate = (item: MenuData) => {
     setSelectedMenu(item);
     setOpen(true);
@@ -113,7 +114,9 @@ export default function MenuCard() {
   }, []);
 
   const handleChange = (event: SelectChangeEvent) => {
-    setCategories(event.target.value);
+    const tmpSelectedMenu = {...selectedMenu}
+    tmpSelectedMenu.menuCategories = [event.target.value];
+    setSelectedMenu(tmpSelectedMenu)
   };
 
   const handleFileChange = (e: any) => {
@@ -179,7 +182,7 @@ export default function MenuCard() {
                     <Select
                       labelId="demo-simple-select-helper-label"
                       id="demo-simple-select-helper"
-                      value={selectedMenu.menuCategories[0]}
+                      value={selectedMenu.menuCategories && selectedMenu.menuCategories[0]}
                       label="Category"
                       onChange={handleChange}
                     >
