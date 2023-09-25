@@ -239,7 +239,8 @@ export default function MenuCard() {
           aria-describedby="modal-modal-description"
         >
           <Box sx={style}>
-            <h1>Add Menu</h1>
+            <h1>{selectedMenu._id === '-1' ? `Add` : 'Edit'} Menu</h1>
+            <br />
             <div
               style={{
                 paddingLeft: 20,
@@ -356,7 +357,7 @@ export default function MenuCard() {
                 {selectedMenu.photo && (
                   <div>
                     <img
-                      src={URL.createObjectURL(selectedMenu.photo)}
+                      src={typeof selectedMenu.photo === 'string' ? selectedMenu.photo : URL.createObjectURL(selectedMenu.photo)}
                       alt="Selected"
                       width="150"
                       height="150"
