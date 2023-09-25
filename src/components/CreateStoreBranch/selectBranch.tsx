@@ -103,7 +103,7 @@ const SelectBranch: React.FC = () => {
               </button>
               // </Link>
             ))}
-            <Link href={"/admin/createStore"}>
+            <Link href={"/admin/createBranch"}>
               <button className={style.addbranch_btn}>Add new Branch</button>
             </Link>
           </Paper>

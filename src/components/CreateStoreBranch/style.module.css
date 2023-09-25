@@ -28,3 +28,6 @@
   font-family: "Quicksand", sans-serif;
   background-color: #db1b1b;
 }
+.avatar{
+  object-fit: cover;
+}

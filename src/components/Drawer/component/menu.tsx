@@ -12,6 +12,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Swal from "sweetalert2";
 
 const style = {
   position: "absolute" as "absolute",
@@ -26,11 +27,13 @@ const style = {
 };
 
 interface MenuData {
-  _id?: string;
+  _id: string;
   title?: string;
   price?: string;
   description?: string;
   photo?: any;
+  quantity?: string;
+  cookingTime?: string;
   menuCategories?: string[];
 }
 interface iCategory {
@@ -43,13 +46,16 @@ interface iCategoryDOM {
 }
 
 export default function MenuCard() {
+  const [errors, setErrors] = useState('');
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [qty, setQty] = useState(1);
   const [description, setDescription] = useState("");
   const [cookingTime, setCookingTime] = useState("");
   const [items, setItems] = useState<MenuData[]>([]);
-  const [selectedMenu, setSelectedMenu] = useState<MenuData>();
+  const [selectedMenu, setSelectedMenu] = useState<MenuData>({
+    _id: '-1'
+  });
 
   const [categories, setCategories] = useState<iCategoryDOM[]>();
   const [open, setOpen] = useState(false);
@@ -113,16 +119,25 @@ export default function MenuCard() {
     fetchMenu();
   }, []);
 
-  const handleChange = (event: SelectChangeEvent) => {
+  const handleDropdownChange = (event: SelectChangeEvent) => {
     const tmpSelectedMenu = {...selectedMenu}
     tmpSelectedMenu.menuCategories = [event.target.value];
     setSelectedMenu(tmpSelectedMenu)
   };
 
+  const handleChangeText = (key: string | number, value: any) => {
+    const tempData = { 
+      ...selectedMenu,
+      [key]: value
+    };
+    setSelectedMenu(tempData);
+  };
+
   const handleFileChange = (e: any) => {
     const selectedFile = e.target.files[0];
-    setPhoto(selectedFile);
+    handleChangeText('photo', selectedFile)
   };
+
   const hiddenFileInput = useRef<HTMLInputElement | null>(null);
 
   const handleUpload = () => {
@@ -130,6 +145,129 @@ export default function MenuCard() {
       hiddenFileInput.current.click();
     }
   };
+
+  const deleteConfirm = async (_id: string) => {
+    const swalResponse = await Swal.fire({
+        title: 'Delete Confirmation',
+        text: 'Are you sure you want to delete this item?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel',
+        reverseButtons: true
+    })
+    if(swalResponse.isConfirmed) {
+      deleteItem(_id);
+    }
+  }
+  const deleteItem = async (_id: string) => {
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/menuItem/${_id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete category");
+      }
+      else {
+        Swal.fire(
+          'Deleted!',
+          'Your item has been deleted.',
+          'success'
+        );
+      }
+      fetchMenu();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleAddMenu = async () => {
+    return new Promise(async (resolve, reject) => {
+      if (!selectedMenu?.title) {
+        setErrors('Title is required.');
+      } else if (!selectedMenu?.description) {
+        setErrors('Description is required.');
+      } else if (!selectedMenu?.quantity) {
+        setErrors('quantity is required.');
+      } else if (!selectedMenu?.cookingTime) {
+        setErrors('cookingTime is required.');
+      } else if (!selectedMenu?.price) {
+        setErrors('Price is required.');
+      } else if (!selectedMenu?.menuCategories) {
+        setErrors('Category is required.');
+      } else if (!selectedMenu?.photo) {
+        setErrors('Photo is required.');
+      } else {
+        setErrors('');
+
+        try {
+          const token = localStorage.getItem('token');
+          const store_Id = localStorage.getItem('store_Id') || '';
+          const branch_Id = localStorage.getItem('branch_Id') || '';
+
+          const headers = {
+            Authorization: `Bearer ${token}`
+          };
+          
+          const formData = new FormData();
+          formData.append('title', selectedMenu.title);
+          formData.append('price', selectedMenu.price);
+          formData.append('description', selectedMenu.description);
+          formData.append('qty', selectedMenu.quantity);
+          formData.append('cookingTime', selectedMenu.cookingTime);
+          formData.append('menuCategory_Id', selectedMenu.menuCategories[0]);
+          formData.append('branch_Id', branch_Id);
+          formData.append('store_Id', store_Id);
+          if(typeof selectedMenu.photo !== 'string') {
+            formData.append("photo", selectedMenu.photo || "");
+          }
+
+          if (selectedMenu._id !== '-1') { //Edit selected
+            const response = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/menuItem/${selectedMenu._id}`,
+              {
+                method: 'PATCH',
+                headers: headers,
+                body: formData,
+              }
+            );
+            const responseData = await response.json();
+            resolve(responseData._id);
+          } else {
+            const response = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/menuItem`,
+              {
+                method: 'POST',
+                headers: headers,
+                body: formData,
+              }
+            );
+            const responseData = await response.json();
+            resolve(responseData._id);
+          }
+        } catch (error) {
+          console.error(error);
+          reject(error);
+        }
+      }
+    });
+  }
+
+  const handleSave = async () => {
+    const menuItemId = await handleAddMenu();
+    fetchMenu();
+    handleClose();
+  }
 
   return (
     <div style={{ marginTop: 10, paddingLeft: 50, paddingRight: 50 }}>
@@ -148,7 +286,8 @@ export default function MenuCard() {
           aria-describedby="modal-modal-description"
         >
           <Box sx={style}>
-            <h1>Add Menu</h1>
+            <h1>{selectedMenu._id === '-1' ? `Add` : 'Edit'} Menu</h1>
+            <br />
             <div
               style={{
                 paddingLeft: 20,
@@ -157,69 +296,67 @@ export default function MenuCard() {
                 justifyContent: "space-around",
               }}
             >
-              {selectedMenu ? (
-                <div
-                  style={{ display: "flex", flexDirection: "column", gap: 10 }}
-                >
-                  <TextField
-                    value={selectedMenu.title}
-                    id="outlined-basic"
-                    label="Title"
-                    variant="outlined"
-                    onChange={(e) => setTitle(e.target.value)}
-                  />
-                  <TextField
-                    value={description}
-                    id="outlined-basic"
-                    label="Description"
-                    variant="outlined"
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
-                  <FormControl>
-                    <InputLabel id="demo-simple-select-helper-label">
-                      Category
-                    </InputLabel>
-                    <Select
-                      labelId="demo-simple-select-helper-label"
-                      id="demo-simple-select-helper"
-                      value={selectedMenu.menuCategories && selectedMenu.menuCategories[0]}
-                      label="Category"
-                      onChange={handleChange}
-                    >
-                      {
-                      categories &&
-                      categories.length > 0 && 
-                      categories.map((category: iCategoryDOM, key:number) => (
-                        <MenuItem value={category.value}>{category.label}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <div
-                    style={{
-                      display: "flex",
-                      textAlign: "center",
-                      marginTop: "10px",
-                      justifyContent: "center",
-                      gap: 20,
-                    }}
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 10 }}
+              >
+                <TextField
+                  value={selectedMenu?.title}
+                  id="outlined-basic"
+                  label="Title"
+                  name="title"
+                  variant="outlined"
+                  onChange={(e) => handleChangeText('title', e.target.value)}
+                />
+                <TextField
+                  value={selectedMenu?.description}
+                  id="outlined-basic"
+                  label="Description"
+                  variant="outlined"
+                  name="description"
+                  onChange={(e) => handleChangeText('description', e.target.value)}
+                />
+                <FormControl>
+                  <InputLabel id="demo-simple-select-helper-label">
+                    Category
+                  </InputLabel>
+                  <Select
+                    labelId="demo-simple-select-helper-label"
+                    id="demo-simple-select-helper"
+                    value={selectedMenu?.menuCategories && selectedMenu.menuCategories[0]}
+                    label="Category"
+                    onChange={handleDropdownChange}
                   >
-                    <button
-                      className={`${styles.save_button} ${styles.btn_save_color}`}
-                      onClick={handleClose}
-                    >
-                      Save
-                    </button>
-                    <button
-                      className={`${styles.save_button} ${styles.btn_color_cancel}`}
-                      onClick={handleClose}
-                    >
-                      Cancel
-                    </button>
-                  </div>
+                    {
+                    categories &&
+                    categories.length > 0 && 
+                    categories.map((category: iCategoryDOM, key:number) => (
+                      <MenuItem value={category.value}>{category.label}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <div
+                  style={{
+                    display: "flex",
+                    textAlign: "center",
+                    marginTop: "10px",
+                    justifyContent: "center",
+                    gap: 20,
+                  }}
+                >
+                  <button
+                    className={`${styles.save_button} ${styles.btn_save_color}`}
+                    onClick={() => handleSave()}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className={`${styles.save_button} ${styles.btn_color_cancel}`}
+                    onClick={handleClose}
+                  >
+                    Cancel
+                  </button>
                 </div>
-              ) : (
-                <div>Loading user data...</div>
-              )}
+              </div>
               <div
                 style={{
                   display: "flex",
@@ -229,28 +366,31 @@ export default function MenuCard() {
                 }}
               >
                 <TextField
-                  value={price}
+                  value={selectedMenu?.price || ''}
                   id="outlined-basic"
                   label="Price"
                   type="number"
                   variant="outlined"
-                  onChange={(e) => setPrice(e.target.value)}
+                  name="price"
+                  onChange={(e) => handleChangeText('price', e.target.value)}
                 />
 
                 <TextField
-                  value={qty}
+                  value={selectedMenu?.quantity || ''}
                   id="outlined-basic"
                   label="Quantity"
                   type="number"
                   variant="outlined"
-                  onChange={(e) => setQty}
+                  name="quantity"
+                  onChange={(e) => handleChangeText('quantity',e.target.value)}
                 />
                 <TextField
-                  value={cookingTime}
+                  value={selectedMenu?.cookingTime || ''}
                   id="outlined-basic"
                   label="Cooking Time"
                   variant="outlined"
-                  onChange={(e) => setCookingTime(e.target.value)}
+                  name="cookingTime"
+                  onChange={(e) => handleChangeText('cookingTime',e.target.value)}
                 />
               </div>
               <div
@@ -261,10 +401,10 @@ export default function MenuCard() {
                   marginLeft: 20,
                 }}
               >
-                {photo && (
+                {selectedMenu.photo && (
                   <div>
                     <img
-                      src={URL.createObjectURL(photo)}
+                      src={typeof selectedMenu.photo === 'string' ? selectedMenu.photo : URL.createObjectURL(selectedMenu.photo)}
                       alt="Selected"
                       width="150"
                       height="150"
@@ -320,7 +460,9 @@ export default function MenuCard() {
                 >
                   Update
                 </button>
-                <button className={`${styles.updateBtn} ${styles.add_menu}`}>
+                <button className={`${styles.updateBtn} ${styles.add_menu}`}
+                  onClick={() => deleteConfirm(item._id)}
+                >
                   Delete
                 </button>
               </CardActions>
