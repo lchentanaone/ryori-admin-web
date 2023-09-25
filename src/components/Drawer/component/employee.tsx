@@ -20,6 +20,7 @@ import Paper from "@mui/material/Paper";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 
 interface Employee {
+  _id: string;
   firstName: string;
   lastName: string;
   username: string;
@@ -41,8 +42,7 @@ const style = {
 };
 export default function EmployeeTable() {
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+
   const [username, setUsername] = useState("");
   const [firstName, setFirstname] = useState("");
   const [lastName, setLastName] = useState("");
@@ -51,7 +51,8 @@ export default function EmployeeTable() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("");
   const [phone, setPhone] = useState("");
-
+  const [employeeExist, setEmployeeExist] = useState(false);
+  const [userOnEdit, setUserOnEdit] = useState(null);
   const [usersData, setUsersData] = useState<Employee[]>([]);
 
   const [error, setError] = useState("");
@@ -99,53 +100,177 @@ export default function EmployeeTable() {
       setError("Passwords do not match.");
     } else {
       setError("");
+
       try {
+        const token = localStorage.getItem("token");
         const branch_Id = localStorage.getItem("branch_Id");
         const store_Id = localStorage.getItem("store_Id");
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              firstName,
-              lastName,
-              username,
-              email,
-              role,
-              password,
-              phone,
-              branch_Id,
-              store_Id,
-            }),
+        console.log(`${process.env.NEXT_PUBLIC_API_URL}/user/${userOnEdit}`);
+
+        if (userOnEdit) {
+          console.log(`${process.env.NEXT_PUBLIC_API_URL}/user/${userOnEdit}`);
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/user/${userOnEdit}`,
+            {
+              method: "PATCH",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                firstName,
+                lastName,
+                username,
+                email,
+                role,
+                password,
+                phone,
+                branch_Id,
+                store_Id,
+              }),
+            }
+          );
+          console.log(
+            firstName,
+            lastName,
+            username,
+            email,
+            role,
+            password,
+            phone,
+            branch_Id,
+            store_Id
+          );
+
+          console.log({ response });
+          if (response.ok) {
+            fetchEmpoyee();
+            console.log("Update Success");
+          } else {
+            setError("Invalid Registration");
           }
-        );
-        console.log(response);
-        if (response.ok) {
-          fetchEmpoyee();
-          setUsername("");
-          setFirstname("");
-          setLastName("");
-          setEmail("");
-          setPassword("");
-          setConfirmPassword("");
-          setPhone("");
-          setRole("");
-          console.log("Success");
         } else {
-          setError("Invalid Registration");
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                firstName,
+                lastName,
+                username,
+                email,
+                role,
+                password,
+                phone,
+                branch_Id,
+                store_Id,
+              }),
+            }
+          );
+          if (response.ok) {
+            fetchEmpoyee();
+            console.log("Success");
+          } else {
+            setError("Invalid Registration");
+          }
         }
+
+        setUsername("");
+        setFirstname("");
+        setLastName("");
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+        setPhone("");
+        setRole("");
       } catch (error) {
         console.log(error);
       }
     }
   };
-
   const addEmployee = () => {
-    handleClose();
-    handleRegister();
+    // handleClose();
+    // handleRegister();
+
+    if (
+      !username ||
+      !firstName ||
+      !lastName ||
+      !email ||
+      !role ||
+      !password ||
+      !phone
+    ) {
+      setError("All fields are required.");
+    } else if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+    } else if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+    } else {
+      setError("");
+      handleRegister();
+      handleClose();
+    }
+  };
+
+  const handleEdit = (user: any) => {
+    setOpen(true);
+    if (user) {
+      setEmployeeExist(true);
+    } else setEmployeeExist(false);
+    setUserOnEdit(user._id);
+    setUsername(user.username);
+    setEmail(user.email);
+    setFirstname(user.firstName);
+    setLastName(user.lastName);
+    setPassword(user.password);
+    setRole(user.role);
+    setPhone(user.phone);
+    console.log(user._id);
+  };
+
+  const handleOpen = () => {
+    setOpen(true);
+    setEmployeeExist(false);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setUserOnEdit(null);
+    setUsername("");
+    setFirstname("");
+    setLastName("");
+    setEmail("");
+    setPassword("");
+    setRole("");
+    setPhone("");
+  };
+
+  const deleteUser = async (_id: string) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user/${_id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete category");
+      }
+      fetchEmpoyee();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -170,7 +295,11 @@ export default function EmployeeTable() {
             aria-describedby="modal-modal-description"
           >
             <Box sx={style}>
-              <h1> Add Employee</h1>
+              {employeeExist ? (
+                <h1>Update Employee Details</h1>
+              ) : (
+                <h1>Add Employee</h1>
+              )}
               <div
                 style={{
                   paddingLeft: 20,
@@ -219,14 +348,21 @@ export default function EmployeeTable() {
                       <MenuItem value={"kitchen"}>Kitchen</MenuItem>
                     </Select>
                   </FormControl>
-                  <TextField
-                    value={password}
-                    id="outlined-basic"
-                    label="password"
-                    type="password"
-                    variant="outlined"
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
+                  {employeeExist ? null : (
+                    <TextField
+                      value={password}
+                      id="outlined-basic"
+                      label="password"
+                      type="password"
+                      variant="outlined"
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  )}
+                  {!employeeExist ? null : (
+                    <p>
+                      Please Contact us for Email and {"\n"} Password Recovery
+                    </p>
+                  )}
                 </div>
                 <div
                   style={{
@@ -248,6 +384,7 @@ export default function EmployeeTable() {
                     id="outlined-basic"
                     label="Email"
                     variant="outlined"
+                    disabled={employeeExist}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                   <TextField
@@ -257,15 +394,17 @@ export default function EmployeeTable() {
                     variant="outlined"
                     onChange={(e) => setPhone(e.target.value)}
                   />
-
-                  <TextField
-                    value={confirmPassword}
-                    id="outlined-basic"
-                    type="password"
-                    label="Confirm Password"
-                    variant="outlined"
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                  />
+                  {employeeExist ? null : (
+                    <TextField
+                      value={confirmPassword}
+                      id="outlined-basic"
+                      type="password"
+                      label="Confirm Password"
+                      variant="outlined"
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                  )}
+                  {error && <div className="error_message">{error}</div>}
                 </div>
               </div>
               <div
@@ -329,10 +468,16 @@ export default function EmployeeTable() {
                   <TableCell>{user.phone}</TableCell>
                   <TableCell>{user.role}</TableCell>
                   <TableCell>
-                    <IconButton aria-label="user">
+                    <IconButton
+                      onClick={() => handleEdit(user)}
+                      aria-label="user"
+                    >
                       <ManageAccountsIcon />
                     </IconButton>
-                    <IconButton aria-label="delete">
+                    <IconButton
+                      onClick={() => deleteUser(user._id)}
+                      aria-label="delete"
+                    >
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>
