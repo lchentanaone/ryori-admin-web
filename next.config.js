@@ -12,7 +12,7 @@ const nextConfig = {
   },
   images: {
     domains: [
-      "ryori-assets.s3.ap-northeast-1.amazonaws.com", 
+      "ryori-assets.s3.ap-northeast-1.amazonaws.com",
       "ryori-assets.s3.amazonaws.com",
       "chart.apis.google.com",
     ],

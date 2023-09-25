@@ -11,6 +11,14 @@
   --flip: flip;
   --fadeInDown: fadeInDown;
 }
+.logut {
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: "Quicksand", sans-serif;
+  color: #000;
+}
 .button-primary {
   background-color: var(--color-primary);
   color: var(--color-tertiary);
@@ -22,6 +30,9 @@
   font-family: "Quicksand", sans-serif;
 }
 h1 {
+  font-family: "Quicksand", sans-serif;
+}
+.div {
   font-family: "Quicksand", sans-serif;
 }
 .input-width {

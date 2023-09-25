@@ -109,7 +109,9 @@ const SelectBranch: React.FC = () => {
           </Paper>
         </Grid>
         <div style={{ marginTop: 20 }}>
-          <button onClick={handleLogout}>Logout</button>
+          <button className="logut" onClick={handleLogout}>
+            Logout
+          </button>
         </div>
       </Grid>
     </div>

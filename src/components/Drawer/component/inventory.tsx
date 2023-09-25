@@ -17,17 +17,8 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
-
-function createData(
-  firstName: string,
-  lastName: string,
-  username: string,
-  email: string,
-  role: string,
-  phone: string
-) {
-  return { firstName, lastName, email, username, role, phone };
-}
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 
 interface Category {
   _id: string;
@@ -58,6 +49,7 @@ export default function Inventory() {
   const [errorTypeLog, setErrorTypeLog] = useState("");
   const [type, setType] = useState("");
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState("");
 
   const style = {
     position: "absolute" as "absolute",
@@ -109,73 +101,79 @@ export default function Inventory() {
   };
 
   const addCategory = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const branch_Id = localStorage.getItem("branch_Id");
-      const user_Id = localStorage.getItem("user_Id");
+    if (!item || !quantity) {
+      setError("Category, Product Name and Quantity are required");
+    } else {
+      setError("");
+      try {
+        const token = localStorage.getItem("token");
+        const branch_Id = localStorage.getItem("branch_Id");
+        const user_Id = localStorage.getItem("user_Id");
 
-      if (itemOnEdit) {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/inventory/rawgrocery/${itemOnEdit}`,
-          {
-            method: "PATCH",
-            body: JSON.stringify({
-              item,
-              weight,
-              quantity,
-              branch_Id,
-              user_Id,
-              rawCategory_Id: selectedCategory,
-            }),
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        if (response.ok) {
-          fetchItems();
-          const responseData = await response.json();
-          if (Array.isArray(responseData)) {
-            fetchCategory();
-            setCategory(responseData);
+        if (itemOnEdit) {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/inventory/rawgrocery/${itemOnEdit}`,
+            {
+              method: "PATCH",
+              body: JSON.stringify({
+                item,
+                weight,
+                quantity,
+                branch_Id,
+                user_Id,
+                rawCategory_Id: selectedCategory,
+              }),
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          if (response.ok) {
+            fetchItems();
+            const responseData = await response.json();
+            if (Array.isArray(responseData)) {
+              fetchCategory();
+              setCategory(responseData);
+            }
+          } else {
+            console.error("Failed to add category");
           }
         } else {
-          console.error("Failed to add category");
-        }
-      } else {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/inventory/rawgrocery`,
-          {
-            method: "POST",
-            body: JSON.stringify({
-              item,
-              weight,
-              quantity,
-              branch_Id,
-              user_Id,
-              rawCategory_Id: selectedCategory,
-            }),
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        if (response.ok) {
-          fetchItems();
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/inventory/rawgrocery`,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                item,
+                weight,
+                quantity,
+                branch_Id,
+                user_Id,
+                rawCategory_Id: selectedCategory,
+              }),
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          if (response.ok) {
+            fetchItems();
 
-          const responseData = await response.json();
-        } else {
-          console.error("Failed to add item.");
+            const responseData = await response.json();
+          } else {
+            console.error("Failed to add item.");
+          }
         }
+        setItemOnEdit("");
+        setItem("");
+        setWeight("");
+        setQuantity("");
+        setSelectedCategory("");
+      } catch (error) {
+        console.error("Error:", error);
       }
-      setItemOnEdit("");
-      setItem("");
-      setWeight("");
-      setQuantity("");
-    } catch (error) {
-      console.error("Error:", error);
     }
   };
 
@@ -249,11 +247,6 @@ export default function Inventory() {
     }
   };
 
-  useEffect(() => {
-    fetchCategory();
-    fetchItems();
-  }, []);
-
   const handleOpen = (row: any) => {
     setOpen(true);
     setItemOnEdit(row);
@@ -278,6 +271,11 @@ export default function Inventory() {
     setQuantityLogs(quantityLogs - 1);
   };
 
+  useEffect(() => {
+    fetchCategory();
+    fetchItems();
+  }, []);
+
   return (
     <>
       <div style={{ marginTop: 10, paddingLeft: 50, paddingRight: 50 }}>
@@ -291,8 +289,6 @@ export default function Inventory() {
             <Select
               labelId="demo-simple-select-helper-label"
               id="demo-simple-select-helper"
-              // value={dropdownized(categories)}
-              // value={categories}
               value={selectedCategory}
               label="Category"
               onChange={(e) => setSelectedCategory(e.target.value)}
@@ -333,6 +329,7 @@ export default function Inventory() {
             Save
           </button>
         </div>
+        {error !== "" && <div className="error_message">{error}</div>}
         {/* --- */}
         <div style={{ marginBottom: 10 }}>
           <FormControl style={{ width: 200 }}>
@@ -429,7 +426,7 @@ export default function Inventory() {
                 alignItems: "center",
               }}
             >
-              <h1>Change Password</h1>
+              <h1>Inventory logs</h1>
               <FormControl style={{ width: 200 }}>
                 <InputLabel style={{ marginTop: -5 }}>Type</InputLabel>
                 <Select
@@ -448,9 +445,12 @@ export default function Inventory() {
                 direction="row"
                 style={{ justifyContent: "center", gap: 10 }}
               >
-                <Button variant="contained" onClick={handleDecrease}>
-                  -
-                </Button>
+                <IconButton
+                  className={` ${styles.btn_logs}`}
+                  onClick={handleDecrease}
+                >
+                  <RemoveIcon />
+                </IconButton>
                 <TextField
                   type="number"
                   variant="outlined"
@@ -460,16 +460,24 @@ export default function Inventory() {
                     readOnly: true,
                   }}
                 />
-                <Button variant="contained" onClick={handleIncrease}>
-                  +
-                </Button>
+                <IconButton
+                  className={` ${styles.btn_logs}`}
+                  onClick={handleIncrease}
+                >
+                  <AddIcon />
+                </IconButton>
               </Grid>
               {errorTypeLog !== "" && (
                 <Typography variant="subtitle2" style={{ color: "#ff0000" }}>
                   {errorTypeLog}
                 </Typography>
               )}
-              <button onClick={addQtyLogs}>save</button>
+              <button
+                className={` ${styles.add_inventory}`}
+                onClick={addQtyLogs}
+              >
+                save
+              </button>
             </div>
           </Box>
         </Modal>

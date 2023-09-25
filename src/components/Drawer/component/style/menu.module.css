@@ -28,8 +28,20 @@
   background-color: #4285f4;
   transition: background-color 0.3s;
 }
+
 .add_inventory:hover {
   background-color: #356ac3;
+}
+.btn_logs {
+  padding: 1px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: "Quicksand", sans-serif;
+  color: white;
+  /* background-color: #4285f4; */
+  color: #000;
+  transition: background-color 0.3s;
 }
 .modal_btn {
   display: "flex";
@@ -38,6 +50,7 @@
   justify-content: "center";
   gap: 20;
 }
+
 .uploadImg_menu {
   color: white;
   padding: 5px 40px;
