@@ -12,6 +12,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Swal from "sweetalert2";
 
 const style = {
   position: "absolute" as "absolute",
@@ -26,7 +27,7 @@ const style = {
 };
 
 interface MenuData {
-  _id?: string;
+  _id: string;
   title?: string;
   price?: string;
   description?: string;
@@ -145,6 +146,50 @@ export default function MenuCard() {
     }
   };
 
+  const deleteConfirm = async (_id: string) => {
+    const swalResponse = await Swal.fire({
+        title: 'Delete Confirmation',
+        text: 'Are you sure you want to delete this item?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel',
+        reverseButtons: true
+    })
+    if(swalResponse.isConfirmed) {
+      deleteItem(_id);
+    }
+  }
+  const deleteItem = async (_id: string) => {
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/menuItem/${_id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete category");
+      }
+      else {
+        Swal.fire(
+          'Deleted!',
+          'Your item has been deleted.',
+          'success'
+        );
+      }
+      fetchMenu();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleAddMenu = async () => {
     return new Promise(async (resolve, reject) => {
@@ -183,7 +228,9 @@ export default function MenuCard() {
           formData.append('menuCategory_Id', selectedMenu.menuCategories[0]);
           formData.append('branch_Id', branch_Id);
           formData.append('store_Id', store_Id);
-          formData.append("photo", selectedMenu.photo || "");
+          if(typeof selectedMenu.photo !== 'string') {
+            formData.append("photo", selectedMenu.photo || "");
+          }
 
           if (selectedMenu._id !== '-1') { //Edit selected
             const response = await fetch(
@@ -413,7 +460,9 @@ export default function MenuCard() {
                 >
                   Update
                 </button>
-                <button className={`${styles.updateBtn} ${styles.add_menu}`}>
+                <button className={`${styles.updateBtn} ${styles.add_menu}`}
+                  onClick={() => deleteConfirm(item._id)}
+                >
                   Delete
                 </button>
               </CardActions>
