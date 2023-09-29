@@ -445,8 +445,8 @@ export default function MenuCard() {
           </Box>
         </Modal>
       </div>
-      {/* --- */}
-      <Box sx={{ gap: 4, display: "flex" }}>
+      {/* --table-- */}
+      <Box sx={{ gap: 4, display: "flex", flexWrap: "wrap" }}>
         {items.length > 0 ? (
           items.map((item, index) => (
             <Card
@@ -466,7 +466,7 @@ export default function MenuCard() {
                 className={styles.menuImage}
               />
               <CardContent>
-                <Typography gutterBottom variant="h6" component="div">
+                <Typography variant="h6" component="div">
                   {item.title}
                 </Typography>
                 <p className={styles.price}> ₱ {item.price}</p>
@@ -476,13 +476,13 @@ export default function MenuCard() {
               </CardContent>
               <CardActions>
                 <button
-                  className={`${styles.updateBtn} ${styles.btn_save_color}`}
+                  className={`${styles.menu_btn} ${styles.btn_save_color}`}
                   onClick={() => handleUpdate(item)}
                 >
                   Update
                 </button>
                 <button
-                  className={`${styles.updateBtn} ${styles.add_menu}`}
+                  className={`${styles.menu_btn} ${styles.add_menu}`}
                   onClick={() => deleteConfirm(item._id)}
                 >
                   Delete
