@@ -65,12 +65,13 @@ export default function ArchiveTransaction() {
 
   return (
     <div style={{ marginTop: 10, paddingLeft: 50, paddingRight: 50 }}>
-      <h1>Daily Transactions</h1>
+      <h2>Archive Transactions</h2>
       <Paper sx={{ width: "100%", overflow: "hidden", marginBottom: 2 }}>
         <TableContainer sx={{ maxHeight: 640 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
+                <TableCell>No.</TableCell>
                 <TableCell>ID</TableCell>
                 <TableCell>Table</TableCell>
                 <TableCell>Pay ID</TableCell>
@@ -89,7 +90,6 @@ export default function ArchiveTransaction() {
                         {item._id}
                       </TableCell>
                       <TableCell>{item.table}</TableCell>
-                      <TableCell>{item.email}</TableCell>
                       <TableCell>{item.paymongo_pi_id}</TableCell>
                       <TableCell> {item.total}</TableCell>
                       <TableCell> {item.createdAt}</TableCell>
