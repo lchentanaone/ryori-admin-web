@@ -54,24 +54,18 @@ const StoreInfo: React.FC = () => {
       );
       if (response.ok) {
         const responseData = await response.json();
+
         setStoreData({
           storeName: responseData.storeName,
           photo: responseData.photo,
           appId: responseData.appId,
           appSecret: responseData.appSecret,
-          branchName: responseData.branches[0].branchName,
-          email: responseData.branches[0].email,
-          contactNumber: responseData.branches[0].contactNumber,
-          address: responseData.branches[0].address,
+          contactNumber: responseData.branch.contactNumber,
+          branchName: responseData.branch.branchName,
+          email: responseData.branch.email,
+          address: responseData.branch.address,
         });
         setPhoto(responseData.photo);
-        // setStoreName(responseData.storeName);
-        // setAppId(responseData.appId);
-        // setAppSecret(responseData.appSecret);
-        // setBranchName(responseData.branches[0].branchName);
-        // setEmail(responseData.branches[0].email);
-        // setContactNumber(responseData.branches[0].contactNumber);
-        // setAddress(responseData.branches[0].address);
       } else {
         throw new Error(`Request failed with status: ${response.status}`);
       }
@@ -326,7 +320,7 @@ const StoreInfo: React.FC = () => {
                     <button
                       onClick={isEditing ? handleUpdateClick : handleEditClick}
                       className={
-                        isEditing ? `${styles.green}` : `${styles.save_info}`
+                        isEditing ? `${styles.blue}` : `${styles.save_info}`
                       }
                       style={{ marginTop: 10 }}
                     >
