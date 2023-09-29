@@ -6,7 +6,7 @@ import Link from "next/link";
 import style from "styled-jsx/style";
 
 const SetUpStore: NextPage = () => {
-  const [errors, setErrors] = useState('');
+  const [errors, setErrors] = useState("");
   const [branchData, setBranchData] = useState({
     branchName: "",
     email: "",
@@ -15,17 +15,17 @@ const SetUpStore: NextPage = () => {
   });
 
   const handleAddBranch = async () => {
-    const token = await localStorage.getItem('token');
-    const store_Id = await localStorage.getItem('store_Id');
+    const token = await localStorage.getItem("token");
+    const store_Id = await localStorage.getItem("store_Id");
     const headers = {
       Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     };
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/branch`,
         {
-          method: 'POST',
+          method: "POST",
           headers: headers,
           body: JSON.stringify({
             branchName: branchData.branchName,
@@ -37,7 +37,7 @@ const SetUpStore: NextPage = () => {
         }
       );
       const data = await response.json();
-      await localStorage.setItem('branch_Id', data._id);
+      await localStorage.setItem("branch_Id", data._id);
     } catch (error) {
       console.error(error);
     }
@@ -45,11 +45,11 @@ const SetUpStore: NextPage = () => {
 
   const handleSave = async () => {
     if (!branchData.branchName) {
-      setErrors('Branch name must be provided');
+      setErrors("Branch name must be provided");
     } else {
-      setErrors('');
+      setErrors("");
       await handleAddBranch();
-      window.location.href='/admin/selectBranch'
+      window.location.href = "/admin/selectBranch";
     }
   };
 
@@ -60,6 +60,13 @@ const SetUpStore: NextPage = () => {
       [name]: value,
     }));
   };
+
+  useEffect(() => {
+    const existingToken = localStorage.getItem("token");
+    if (!existingToken) {
+      window.location.href = "/admin/login";
+    }
+  }, []);
 
   return (
     <Grid
@@ -130,9 +137,11 @@ const SetUpStore: NextPage = () => {
             />
           </div>
 
-          <button className="button-primary" onClick={handleSave}>Save</button>
-          {errors !== '' && (
-            <p style={{color: '#ff0000', top: -7}}>{errors}</p>
+          <button className="button-primary" onClick={handleSave}>
+            Save
+          </button>
+          {errors !== "" && (
+            <p style={{ color: "#ff0000", top: -7 }}>{errors}</p>
           )}
         </Paper>
       </Grid>

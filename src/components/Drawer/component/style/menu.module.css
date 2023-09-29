@@ -70,7 +70,7 @@
   color: #fff;
   font-family: "Quicksand", sans-serif;
 }
-.updateBtn {
+.menu_btn {
   padding: 5px 35px;
   font-size: 14px;
   border: none;
@@ -104,6 +104,17 @@
   font-family: "Quicksand", sans-serif;
   color: white;
   background-color: #db1b1b;
+}
+.green {
+  padding: 10px 80px;
+  border: none;
+  border-radius: 5px;
+  width: 100%;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: "Quicksand", sans-serif;
+  color: white;
+  background-color: #4285f4;
 }
 .blue {
   padding: 10px 80px;

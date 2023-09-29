@@ -53,7 +53,6 @@ const LoginForm: React.FC = () => {
     if (response.ok) {
       const jsonData = await response.json();
       const role = jsonData.role;
-
       if (role === "admin") {
         const token = jsonData.access_token;
         localStorage.setItem("token", token);
@@ -62,14 +61,25 @@ const LoginForm: React.FC = () => {
         localStorage.setItem("store_Id", jsonData.store_Id);
         window.location.href = "/admin/selectBranch";
       } else {
-        setError("You are not allowed to log in.");
+        setError("Only the Admin can login here");
         console.log({ error });
+      }
+      if (jsonData.store_Id) {
+        window.location.href = "/admin/selectBranch";
+      } else {
+        window.location.href = "/admin/createStore";
       }
     } else {
       setError("Invalid access token");
       console.log({ error });
     }
   };
+
+  // else  if (jsonData.store_Id) {
+  //   window.location.href = "/admin/selectBranch";
+  // } else {
+  //   window.location.href = "/admin/createStore";
+  // }
 
   useEffect(() => {
     const existingToken = localStorage.getItem("token");
@@ -111,6 +121,7 @@ const LoginForm: React.FC = () => {
                 id="outlined-basic"
                 label="Password"
                 variant="outlined"
+                type="password"
                 fullWidth
                 onChange={(e) => setPassword(e.target.value)}
               />

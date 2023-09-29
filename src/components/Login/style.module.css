@@ -16,3 +16,13 @@
   font-size: var(--fontsize-primary);
   padding: 8px;
 }
+.signup_btn {
+  background-color: var(--color-primary);
+  color: #fff;
+  border-radius: 20px;
+  width: 30%;
+  font-size: var(--fontsize-primary);
+  padding: 5px;
+  border-width: 0;
+  font-family: "Quicksand", sans-serif;
+}

@@ -3,6 +3,7 @@ import { TextField, Button, Grid, Paper, Typography } from "@mui/material";
 import Link from "next/link";
 import ryori from "./../../../public/ryori-red.png";
 import Image from "next/image";
+import style from "./style.module.css";
 
 const RegisterForm: React.FC = () => {
   const [error, setError] = useState("");
@@ -52,8 +53,11 @@ const RegisterForm: React.FC = () => {
             }),
           }
         );
-        console.log(response);
+        const data = await response.json();
+        console.log({ data });
         if (response.ok) {
+          const token = data.access_token;
+          localStorage.setItem("token", token);
           window.location.href = "/admin/createStore";
         } else {
           setError("Invalid Registration");
@@ -185,10 +189,17 @@ const RegisterForm: React.FC = () => {
             </div>
             {/* <Link href={"/admin/createStore"}> */}
             {error && <div className="error_message">{error}</div>}
-            <button className="button-primary" onClick={handleRegister}>
-              Sign up
-            </button>
-            {/* </Link> */}
+            <div
+              style={{
+                justifyContent: "center",
+
+                display: "flex",
+              }}
+            >
+              <button className={style.signup_btn} onClick={handleRegister}>
+                Sign up
+              </button>
+            </div>
           </div>
         </Paper>
       </Grid>

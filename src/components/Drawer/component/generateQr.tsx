@@ -99,7 +99,7 @@ const QRGenerator = () => {
             >
               <button
                 onClick={handleGenerateQrCode}
-                className={styles.green}
+                className={styles.blue}
                 style={{ marginTop: 10 }}
               >
                 Generate

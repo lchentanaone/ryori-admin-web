@@ -75,10 +75,11 @@ export default function EmployeeTable() {
           },
         }
       );
-
       const responseData = await response.json();
-      console.log({ responseData });
-      setUsersData(responseData);
+      const employeeOnly = responseData.filter(
+        (_employeeRole: Employee) => _employeeRole.role !== "admin"
+      );
+      setUsersData(employeeOnly);
     } catch (error) {
       console.error(error);
     }
@@ -363,7 +364,7 @@ export default function EmployeeTable() {
   return (
     <>
       <div style={{ marginTop: 10, paddingLeft: 50, paddingRight: 50 }}>
-        <h1>Employee</h1>
+        <h1>Employees</h1>
         <div>
           <button
             onClick={handleOpen}

@@ -86,10 +86,11 @@ const CreateStore: React.FC = () => {
   };
 
   useEffect(() => {
-    const existingToken = localStorage.getItem("token");
-    if (!existingToken) {
+    const token = localStorage.getItem("token");
+    if (!token) {
       window.location.href = "/admin/login";
     }
+    console.log({ token });
   }, []);
 
   return (
