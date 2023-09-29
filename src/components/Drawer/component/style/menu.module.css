@@ -3,6 +3,7 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 12px;
   font-family: "Quicksand", sans-serif;
 }
 .btn_color_cancel {
@@ -18,7 +19,7 @@
   background-color: #db1b1b;
 }
 .add_inventory {
-  padding: 18px 70px;
+  padding: 12px 70px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -53,10 +54,11 @@
 
 .uploadImg_menu {
   color: white;
-  padding: 5px 40px;
+  padding: 2px 40px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 12px;
   font-family: "Quicksand", sans-serif;
   background-color: #db1b1b;
 }
@@ -85,7 +87,7 @@
   text-align: "center";
   justify-content: "center";
   margin-top: 2px;
-  margin-left: 20px;
+  margin-left: 10px;
   padding: 20;
 }
 .top {
@@ -97,12 +99,13 @@
   border: none;
   border-radius: 5px;
   width: 100%;
+  font-size: 12px;
   cursor: pointer;
   font-family: "Quicksand", sans-serif;
   color: white;
   background-color: #db1b1b;
 }
-.green {
+.blue {
   padding: 10px 80px;
   border: none;
   border-radius: 5px;
@@ -110,6 +113,7 @@
   width: 100%;
   font-family: "Quicksand", sans-serif;
   color: white;
+  font-size: 12px;
   background-color: #4285f4;
 }
 .menuImage {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Typography, TextField, Grid, Paper, Box } from "@mui/material";
 import qrcode from "./../../../../public/qr.png";
 import Image from "next/image";
@@ -25,14 +25,16 @@ const QRGenerator = () => {
   const handleGenerateQrCode = async () => {
     const store_Id = localStorage.getItem("store_Id");
     const branch_Id = localStorage.getItem("branch_Id");
-    const originalStr = `id=${store_Id}&branch=${branch_Id}&table=${table}`
+    const originalStr = `id=${store_Id}&branch=${branch_Id}&table=${table}`;
 
-    const request = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/encrypt/${originalStr}`)
-    const encryptedStr = await request.text()
-    const strToQr = `${process.env.NEXT_PUBLIC_RYORI_WEB_APP}?token=${encryptedStr}`
-    console.log({originalStr, encryptedStr, strToQr})
-    setQrString(strToQr)    
-  }
+    const request = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/encrypt/${originalStr}`
+    );
+    const encryptedStr = await request.text();
+    const strToQr = `${process.env.NEXT_PUBLIC_RYORI_WEB_APP}?token=${encryptedStr}`;
+    console.log({ originalStr, encryptedStr, strToQr });
+    setQrString(strToQr);
+  };
   const style = {
     position: "absolute" as "absolute",
     top: "50%",
@@ -44,7 +46,12 @@ const QRGenerator = () => {
     // boxShadow: 24,
     p: 4,
   };
-
+  useEffect(() => {
+    const existingToken = localStorage.getItem("token");
+    if (!existingToken) {
+      window.location.href = "/admin/login";
+    }
+  }, []);
   return (
     <Grid container justifyContent="center" alignItems="center" height="100vh">
       <Paper elevation={3} style={{ padding: "80px", width: 600 }}>
@@ -61,7 +68,9 @@ const QRGenerator = () => {
           <Typography variant="h5">Generate Table QR Code here</Typography>
           <Grid item xs={12} textAlign="center">
             {qrString && (
-              <Image width={300} height={300} 
+              <Image
+                width={300}
+                height={300}
                 alt="QR Code"
                 src={`https://chart.apis.google.com/chart?cht=qr&chs=248&chl=${qrString}`}
               />

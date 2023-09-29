@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import style from "./style.module.css";
 import Link from "next/link";
 import { TextField, Grid, Paper, Typography } from "@mui/material";
@@ -9,6 +9,33 @@ const LoginForm: React.FC = () => {
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // const handleLogin = async () => {
+  //   console.log(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`);
+  //   const response = await fetch(
+  //     `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+  //     {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ email, password }),
+  //     }
+  //   );
+
+  //   if (response.ok) {
+  //     const jsonData = await response.json();
+  //     const token = jsonData.access_token;
+  //     localStorage.setItem("token", token);
+  //     localStorage.setItem("role", jsonData.role);
+  //     localStorage.setItem("user_Id", jsonData.user_Id);
+  //     localStorage.setItem("store_Id", jsonData.store_Id);
+  //     window.location.href = "/admin/selectBranch";
+  //   } else {
+  //     setError("Invalid access token");
+  //     console.log({ error });
+  //   }
+  // };
 
   const handleLogin = async () => {
     console.log(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`);
@@ -25,17 +52,32 @@ const LoginForm: React.FC = () => {
 
     if (response.ok) {
       const jsonData = await response.json();
-      const token = jsonData.access_token;
-      localStorage.setItem("token", token);
-      localStorage.setItem("role", jsonData.role);
-      localStorage.setItem("user_Id", jsonData.user_Id);
-      localStorage.setItem("store_Id", jsonData.store_Id);
-      window.location.href = "/admin/selectBranch";
+      const role = jsonData.role;
+
+      if (role === "admin") {
+        const token = jsonData.access_token;
+        localStorage.setItem("token", token);
+        localStorage.setItem("role", role);
+        localStorage.setItem("user_Id", jsonData.user_Id);
+        localStorage.setItem("store_Id", jsonData.store_Id);
+        window.location.href = "/admin/selectBranch";
+      } else {
+        setError("You are not allowed to log in.");
+        console.log({ error });
+      }
     } else {
       setError("Invalid access token");
       console.log({ error });
     }
   };
+
+  useEffect(() => {
+    const existingToken = localStorage.getItem("token");
+
+    if (existingToken) {
+      window.location.href = "/admin/selectBranch";
+    }
+  }, []);
 
   return (
     <Grid

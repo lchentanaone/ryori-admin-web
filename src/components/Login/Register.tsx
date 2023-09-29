@@ -49,8 +49,6 @@ const RegisterForm: React.FC = () => {
               email,
               password,
               phoneNumber,
-
-              // affiliate_id,
             }),
           }
         );

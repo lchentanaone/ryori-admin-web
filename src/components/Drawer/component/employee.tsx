@@ -18,6 +18,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import Swal from "sweetalert2";
 
 interface Employee {
   _id: string;
@@ -85,12 +86,7 @@ export default function EmployeeTable() {
 
   // TODO: Refactor so that register and update will be on 1 function which is save.
   const updateEmployee = async () => {
-    if (
-      !username ||
-      !firstName ||
-      !lastName ||
-      !phone
-    ) {
+    if (!username || !firstName || !lastName || !phone) {
       setError("All fields are required.");
     } else {
       setError("");
@@ -136,7 +132,7 @@ export default function EmployeeTable() {
         console.log(error);
       }
     }
-  }
+  };
 
   const handleRegister = async () => {
     if (
@@ -275,13 +271,7 @@ export default function EmployeeTable() {
 
   // TODO: Refactor so that addEmployee and EditEmployee are on the same function.
   const editEmployee = () => {
-    if (
-      !username ||
-      !firstName ||
-      !lastName ||
-      !role ||
-      !phone
-    ) {
+    if (!username || !firstName || !lastName || !role || !phone) {
       setError("All fields are required.");
     } else {
       setError("");
@@ -324,6 +314,21 @@ export default function EmployeeTable() {
     setPhone("");
   };
 
+  const deleteConfirm = async (_id: string) => {
+    const swalResponse = await Swal.fire({
+      title: "Delete Confirmation",
+      text: "Are you sure you want to delete this item?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel",
+      reverseButtons: true,
+    });
+    if (swalResponse.isConfirmed) {
+      deleteUser(_id);
+    }
+  };
+
   const deleteUser = async (_id: string) => {
     try {
       const token = localStorage.getItem("token");
@@ -349,6 +354,10 @@ export default function EmployeeTable() {
 
   useEffect(() => {
     fetchEmpoyee();
+    const existingToken = localStorage.getItem("token");
+    if (!existingToken) {
+      window.location.href = "/admin/login";
+    }
   }, []);
 
   return (
@@ -533,14 +542,24 @@ export default function EmployeeTable() {
                     },
                   }}
                 >
-                  <TableCell component="th" scope="row">
+                  <TableCell style={{ fontSize: "12px" }}>
                     {user.firstName}
                   </TableCell>
-                  <TableCell>{user.lastName}</TableCell>
-                  <TableCell>{user.username}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.phone}</TableCell>
-                  <TableCell>{user.role}</TableCell>
+                  <TableCell style={{ fontSize: "12px" }}>
+                    {user.lastName}
+                  </TableCell>
+                  <TableCell style={{ fontSize: "12px" }}>
+                    {user.username}
+                  </TableCell>
+                  <TableCell style={{ fontSize: "12px" }}>
+                    {user.email}
+                  </TableCell>
+                  <TableCell style={{ fontSize: "12px" }}>
+                    {user.phone}
+                  </TableCell>
+                  <TableCell style={{ fontSize: "12px" }}>
+                    {user.role}
+                  </TableCell>
                   <TableCell>
                     <IconButton
                       onClick={() => handleEdit(user)}
@@ -549,7 +568,7 @@ export default function EmployeeTable() {
                       <ManageAccountsIcon />
                     </IconButton>
                     <IconButton
-                      onClick={() => deleteUser(user._id)}
+                      onClick={() => deleteConfirm(user._id)}
                       aria-label="delete"
                     >
                       <DeleteIcon />

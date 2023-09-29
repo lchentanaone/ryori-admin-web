@@ -13,7 +13,7 @@ const Categories = () => {
       style={{ paddingLeft: 80, paddingRight: 80 }}
     >
       <Grid item xs={12} style={{ marginBottom: 10 }}>
-        <Typography variant="h5">Add Categories</Typography>
+        <Typography variant="h6">Add Categories</Typography>
       </Grid>
       <Grid container spacing={10} alignItems="center" justifyContent="center">
         <Grid item xs={12} md={6}>

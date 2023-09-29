@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { TextField, Button, Grid, Paper, Typography } from "@mui/material";
 import Link from "next/link";
 import style from "./style.module.css";
@@ -7,7 +7,7 @@ const CreateStore: React.FC = () => {
   const [photo, setPhoto] = useState("");
   const [storeName, setStoreName] = useState("");
   const [branchName, setBranchName] = useState("");
-  const [errors, setErrors] = useState('');
+  const [errors, setErrors] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
   const [contactNumber, setContactNumber] = useState("");
@@ -17,51 +17,48 @@ const CreateStore: React.FC = () => {
     email: "",
     address: "",
     contactNumber: "",
-    photo: ''
+    photo: "",
   });
 
   const handleAddStoreWithBranch = async () => {
-    const token = await localStorage.getItem('token');
+    const token = await localStorage.getItem("token");
 
     const headers = {
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     };
 
     try {
       const formData = new FormData();
-      formData.append('storeName', storeData.storeName);
-      formData.append('photo', storeData.photo);
-      formData.append('branchName', storeData.branchName);
-      formData.append('email', storeData.email);
-      formData.append('contactNumber', storeData.contactNumber);
-      formData.append('address', storeData.address);
+      formData.append("storeName", storeData.storeName);
+      formData.append("photo", storeData.photo);
+      formData.append("branchName", storeData.branchName);
+      formData.append("email", storeData.email);
+      formData.append("contactNumber", storeData.contactNumber);
+      formData.append("address", storeData.address);
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/store`,
-        {
-          method: 'POST',
-          headers: headers,
-          body: formData,
-        }
-      );
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/store`, {
+        method: "POST",
+        headers: headers,
+        body: formData,
+      });
       const data = await response.json();
-      await localStorage.setItem('store_Id', data._id.toString());
-      await localStorage.setItem('branch_Id', data.branches[0]._id);
+      await localStorage.setItem("store_Id", data._id.toString());
+      await localStorage.setItem("branch_Id", data.branches[0]._id);
     } catch (error) {
       console.error(error);
     }
   };
   const handleSave = async () => {
     if (!storeData.photo || !storeData.storeName || !storeData.branchName) {
-      setErrors('Logo, Store, and Branch name must be provided');
+      setErrors("Logo, Store, and Branch name must be provided");
     } else {
-      setErrors('');
+      setErrors("");
       // if (type === 'branch') {
       //   await handleAddBranch();
       // } else {
-        await handleAddStoreWithBranch();
+      await handleAddStoreWithBranch();
       // }
-      window.location.href='/admin/dashboard'
+      window.location.href = "/admin/dashboard";
     }
   };
 
@@ -87,6 +84,13 @@ const CreateStore: React.FC = () => {
       hiddenFileInput.current.click();
     }
   };
+
+  useEffect(() => {
+    const existingToken = localStorage.getItem("token");
+    if (!existingToken) {
+      window.location.href = "/admin/login";
+    }
+  }, []);
 
   return (
     <Grid
@@ -118,7 +122,11 @@ const CreateStore: React.FC = () => {
                 <div style={{ marginTop: 10 }}>
                   <Image
                     className={style.avatar}
-                    src={typeof storeData.photo === 'string' ? storeData.photo : URL.createObjectURL(storeData.photo)}
+                    src={
+                      typeof storeData.photo === "string"
+                        ? storeData.photo
+                        : URL.createObjectURL(storeData.photo)
+                    }
                     alt="Selected"
                     width="170"
                     height="200"
@@ -138,70 +146,72 @@ const CreateStore: React.FC = () => {
               />
             </div>
           </div>
+          <TextField
+            label="Store Name"
+            variant="outlined"
+            fullWidth
+            value={storeData.storeName}
+            name="storeName"
+            onChange={handleChange}
+            required
+            margin="normal"
+            style={{ marginRight: "10px" }}
+          />
+
+          <div style={{ display: "flex", flexDirection: "row" }}>
             <TextField
-              label="Store Name"
+              label="Branch Name"
               variant="outlined"
               fullWidth
-              value={storeData.storeName}
-              name="storeName"
+              value={storeData.branchName}
+              name="branchName"
               onChange={handleChange}
               required
               margin="normal"
               style={{ marginRight: "10px" }}
             />
+            <TextField
+              label="Email"
+              variant="outlined"
+              fullWidth
+              value={storeData.email}
+              name="email"
+              onChange={handleChange}
+              required
+              type="email"
+              margin="normal"
+            />
+          </div>
+          <div style={{ display: "flex", flexDirection: "row" }}>
+            <TextField
+              label="Address"
+              variant="outlined"
+              fullWidth
+              name="address"
+              value={storeData.address}
+              onChange={handleChange}
+              required
+              margin="normal"
+              style={{ marginRight: "10px" }}
+            />
+            <TextField
+              label="Phone Number"
+              variant="outlined"
+              fullWidth
+              value={storeData.contactNumber}
+              name="contactNumber"
+              onChange={handleChange}
+              required
+              margin="normal"
+            />
+          </div>
 
-            <div style={{ display: "flex", flexDirection: "row" }}>
-              <TextField
-                label="Branch Name"
-                variant="outlined"
-                fullWidth
-                value={storeData.branchName}
-                name="branchName"
-                onChange={handleChange}
-                required
-                margin="normal"
-                style={{ marginRight: "10px" }}
-              />
-              <TextField
-                label="Email"
-                variant="outlined"
-                fullWidth
-                value={storeData.email}
-                name="email"
-                onChange={handleChange}
-                required
-                type="email"
-                margin="normal"
-              />
-            </div>
-            <div style={{ display: "flex", flexDirection: "row" }}>
-              <TextField
-                label="Address"
-                variant="outlined"
-                fullWidth
-                name="address"
-                value={storeData.address}
-                onChange={handleChange}
-                required
-                margin="normal"
-                style={{ marginRight: "10px" }}
-              />
-              <TextField
-                label="Phone Number"
-                variant="outlined"
-                fullWidth
-                value={storeData.contactNumber}
-                name="contactNumber"
-                onChange={handleChange}
-                required
-                margin="normal"
-              />
-            </div>
-
-            <button className="button-primary" onClick={handleSave}>Save</button>
-            {errors !== '' && (
-              <p style={{color: '#ff0000', top: -7}}>{errors}</p>
-            )}
+          <button className="button-primary" onClick={handleSave}>
+            Save
+          </button>
+          {errors !== "" && (
+            <p style={{ color: "#ff0000", top: -7 }}>{errors}</p>
+          )}
         </Paper>
       </Grid>
     </Grid>

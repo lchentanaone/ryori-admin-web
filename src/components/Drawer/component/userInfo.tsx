@@ -176,11 +176,16 @@ const UserInfo = () => {
 
   useEffect(() => {
     fetchUserData();
+    const existingToken = localStorage.getItem("token");
+
+    if (!existingToken) {
+      window.location.href = "/admin/login";
+    }
   }, []);
 
   return (
     <Grid container justifyContent="center" alignItems="center" height="100vh">
-      <Paper elevation={3} style={{ padding: "80px", width: 800 }}>
+      <Paper elevation={3} style={{ padding: "20px", width: 800 }}>
         <Grid
           container
           spacing={2}
@@ -192,10 +197,20 @@ const UserInfo = () => {
           }}
         >
           {userData ? (
-            <div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                textAlign: "center",
+              }}
+            >
+              <Typography variant="h6" style={{ marginTop: 10 }}>
+                Personal Detaits
+              </Typography>
               <Grid item xs={12} textAlign="center">
                 <Image src={avatar} alt="ryori" width={160} height={150} />
               </Grid>
+
               <Grid container spacing={2} style={{ marginTop: 20 }}>
                 <Grid item xs={12} sm={6}>
                   <TextField
@@ -263,7 +278,7 @@ const UserInfo = () => {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                {/* <Grid item xs={12}>
                   <TextField
                     label="Address"
                     variant="outlined"
@@ -277,7 +292,7 @@ const UserInfo = () => {
                       handleChangeText("address", e.target.value);
                     }}
                   />
-                </Grid>
+                </Grid> */}
               </Grid>
 
               <Grid item xs={12} textAlign="center">
@@ -294,7 +309,7 @@ const UserInfo = () => {
                   <button
                     onClick={isEditing ? updateUser : handleEditClick}
                     className={
-                      isEditing ? `${styles.green}` : `${styles.save_info}`
+                      isEditing ? `${styles.blue}` : `${styles.save_info}`
                     }
                     style={{ marginTop: 10 }}
                   >

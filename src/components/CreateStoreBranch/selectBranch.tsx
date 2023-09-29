@@ -75,6 +75,10 @@ const SelectBranch: React.FC = () => {
   };
   useEffect(() => {
     init();
+    const existingToken = localStorage.getItem("token");
+    if (!existingToken) {
+      window.location.href = "/admin/login";
+    }
   }, []);
 
   return (
@@ -85,7 +89,7 @@ const SelectBranch: React.FC = () => {
         alignItems="center"
         style={{ height: "100vh", flexDirection: "column" }}
       >
-        <Grid item xs={12} sm={8} md={6} lg={3}>
+        <Grid item xs={12} sm={8} md={3}>
           <Paper elevation={3} style={{ padding: "20px", textAlign: "center" }}>
             <Typography variant="h5">
               {storeData && storeData.storeName}
@@ -93,7 +97,6 @@ const SelectBranch: React.FC = () => {
 
             <Typography variant="subtitle2">Select Branch</Typography>
             {branchData.map((branch, index) => (
-              // <Link href={"/admin/dashboard?id=" + branch._id}>
               <button
                 key={index}
                 className={style.branch_btn}
@@ -101,7 +104,6 @@ const SelectBranch: React.FC = () => {
               >
                 {branch.branchName}
               </button>
-              // </Link>
             ))}
             <Link href={"/admin/createBranch"}>
               <button className={style.addbranch_btn}>Add new Branch</button>

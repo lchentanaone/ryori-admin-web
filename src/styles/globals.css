@@ -93,5 +93,7 @@ a {
 }
 .error_message {
   color: red;
+  font-size: 12px;
   font-family: "Quicksand", sans-serif;
+  margin-bottom: 5px;
 }

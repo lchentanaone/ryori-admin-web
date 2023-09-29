@@ -37,16 +37,16 @@ interface MenuData {
   menuCategories?: string[];
 }
 interface iCategory {
-  title: string
-  _id: string
+  title: string;
+  _id: string;
 }
 interface iCategoryDOM {
-  label: string
-  value: string
+  label: string;
+  value: string;
 }
 
 export default function MenuCard() {
-  const [errors, setErrors] = useState('');
+  const [errors, setErrors] = useState("");
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [qty, setQty] = useState(1);
@@ -54,13 +54,16 @@ export default function MenuCard() {
   const [cookingTime, setCookingTime] = useState("");
   const [items, setItems] = useState<MenuData[]>([]);
   const [selectedMenu, setSelectedMenu] = useState<MenuData>({
-    _id: '-1'
+    _id: "-1",
   });
 
   const [categories, setCategories] = useState<iCategoryDOM[]>();
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedMenu("");
+  };
   const [photo, setPhoto] = useState(null);
 
   const fetchCategory = async () => {
@@ -76,7 +79,7 @@ export default function MenuCard() {
         }
       );
       const _categories = await response.json();
-      const dropdownCategories = _categories.map((item:iCategory) => ({
+      const dropdownCategories = _categories.map((item: iCategory) => ({
         label: item.title,
         value: item._id,
       }));
@@ -114,28 +117,24 @@ export default function MenuCard() {
     setSelectedMenu(item);
     setOpen(true);
   };
-  useEffect(() => {
-    fetchCategory();
-    fetchMenu();
-  }, []);
 
   const handleDropdownChange = (event: SelectChangeEvent) => {
-    const tmpSelectedMenu = {...selectedMenu}
+    const tmpSelectedMenu = { ...selectedMenu };
     tmpSelectedMenu.menuCategories = [event.target.value];
-    setSelectedMenu(tmpSelectedMenu)
+    setSelectedMenu(tmpSelectedMenu);
   };
 
   const handleChangeText = (key: string | number, value: any) => {
-    const tempData = { 
+    const tempData = {
       ...selectedMenu,
-      [key]: value
+      [key]: value,
     };
     setSelectedMenu(tempData);
   };
 
   const handleFileChange = (e: any) => {
     const selectedFile = e.target.files[0];
-    handleChangeText('photo', selectedFile)
+    handleChangeText("photo", selectedFile);
   };
 
   const hiddenFileInput = useRef<HTMLInputElement | null>(null);
@@ -148,20 +147,19 @@ export default function MenuCard() {
 
   const deleteConfirm = async (_id: string) => {
     const swalResponse = await Swal.fire({
-        title: 'Delete Confirmation',
-        text: 'Are you sure you want to delete this item?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, cancel',
-        reverseButtons: true
-    })
-    if(swalResponse.isConfirmed) {
+      title: "Delete Confirmation",
+      text: "Are you sure you want to delete this item?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel",
+      reverseButtons: true,
+    });
+    if (swalResponse.isConfirmed) {
       deleteItem(_id);
     }
-  }
+  };
   const deleteItem = async (_id: string) => {
-
     try {
       const token = localStorage.getItem("token");
 
@@ -177,13 +175,8 @@ export default function MenuCard() {
 
       if (!response.ok) {
         throw new Error("Failed to delete category");
-      }
-      else {
-        Swal.fire(
-          'Deleted!',
-          'Your item has been deleted.',
-          'success'
-        );
+      } else {
+        Swal.fire("Deleted!", "Your item has been deleted.", "success");
       }
       fetchMenu();
     } catch (error) {
@@ -194,49 +187,50 @@ export default function MenuCard() {
   const handleAddMenu = async () => {
     return new Promise(async (resolve, reject) => {
       if (!selectedMenu?.title) {
-        setErrors('Title is required.');
+        setErrors("Title is required.");
       } else if (!selectedMenu?.description) {
-        setErrors('Description is required.');
+        setErrors("Description is required.");
       } else if (!selectedMenu?.quantity) {
-        setErrors('quantity is required.');
+        setErrors("quantity is required.");
       } else if (!selectedMenu?.cookingTime) {
-        setErrors('cookingTime is required.');
+        setErrors("cookingTime is required.");
       } else if (!selectedMenu?.price) {
-        setErrors('Price is required.');
+        setErrors("Price is required.");
       } else if (!selectedMenu?.menuCategories) {
-        setErrors('Category is required.');
+        setErrors("Category is required.");
       } else if (!selectedMenu?.photo) {
-        setErrors('Photo is required.');
+        setErrors("Photo is required.");
       } else {
-        setErrors('');
+        setErrors("");
 
         try {
-          const token = localStorage.getItem('token');
-          const store_Id = localStorage.getItem('store_Id') || '';
-          const branch_Id = localStorage.getItem('branch_Id') || '';
+          const token = localStorage.getItem("token");
+          const store_Id = localStorage.getItem("store_Id") || "";
+          const branch_Id = localStorage.getItem("branch_Id") || "";
 
           const headers = {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           };
-          
+
           const formData = new FormData();
-          formData.append('title', selectedMenu.title);
-          formData.append('price', selectedMenu.price);
-          formData.append('description', selectedMenu.description);
-          formData.append('qty', selectedMenu.quantity);
-          formData.append('cookingTime', selectedMenu.cookingTime);
-          formData.append('menuCategory_Id', selectedMenu.menuCategories[0]);
-          formData.append('branch_Id', branch_Id);
-          formData.append('store_Id', store_Id);
-          if(typeof selectedMenu.photo !== 'string') {
+          formData.append("title", selectedMenu.title);
+          formData.append("price", selectedMenu.price);
+          formData.append("description", selectedMenu.description);
+          formData.append("qty", selectedMenu.quantity);
+          formData.append("cookingTime", selectedMenu.cookingTime);
+          formData.append("menuCategory_Id", selectedMenu.menuCategories[0]);
+          formData.append("branch_Id", branch_Id);
+          formData.append("store_Id", store_Id);
+          if (typeof selectedMenu.photo !== "string") {
             formData.append("photo", selectedMenu.photo || "");
           }
 
-          if (selectedMenu._id !== '-1') { //Edit selected
+          if (selectedMenu._id !== "-1") {
+            //Edit selected
             const response = await fetch(
               `${process.env.NEXT_PUBLIC_API_URL}/menuItem/${selectedMenu._id}`,
               {
-                method: 'PATCH',
+                method: "PATCH",
                 headers: headers,
                 body: formData,
               }
@@ -247,7 +241,7 @@ export default function MenuCard() {
             const response = await fetch(
               `${process.env.NEXT_PUBLIC_API_URL}/menuItem`,
               {
-                method: 'POST',
+                method: "POST",
                 headers: headers,
                 body: formData,
               }
@@ -261,13 +255,22 @@ export default function MenuCard() {
         }
       }
     });
-  }
+  };
 
   const handleSave = async () => {
     const menuItemId = await handleAddMenu();
     fetchMenu();
     handleClose();
-  }
+  };
+
+  useEffect(() => {
+    fetchCategory();
+    fetchMenu();
+    const existingToken = localStorage.getItem("token");
+    if (!existingToken) {
+      window.location.href = "/admin/login";
+    }
+  }, []);
 
   return (
     <div style={{ marginTop: 10, paddingLeft: 50, paddingRight: 50 }}>
@@ -286,7 +289,7 @@ export default function MenuCard() {
           aria-describedby="modal-modal-description"
         >
           <Box sx={style}>
-            <h1>{selectedMenu._id === '-1' ? `Add` : 'Edit'} Menu</h1>
+            <h1>{selectedMenu._id === "-1" ? `Add` : "Edit"} Menu</h1>
             <br />
             <div
               style={{
@@ -305,7 +308,7 @@ export default function MenuCard() {
                   label="Title"
                   name="title"
                   variant="outlined"
-                  onChange={(e) => handleChangeText('title', e.target.value)}
+                  onChange={(e) => handleChangeText("title", e.target.value)}
                 />
                 <TextField
                   value={selectedMenu?.description}
@@ -313,7 +316,9 @@ export default function MenuCard() {
                   label="Description"
                   variant="outlined"
                   name="description"
-                  onChange={(e) => handleChangeText('description', e.target.value)}
+                  onChange={(e) =>
+                    handleChangeText("description", e.target.value)
+                  }
                 />
                 <FormControl>
                   <InputLabel id="demo-simple-select-helper-label">
@@ -322,16 +327,20 @@ export default function MenuCard() {
                   <Select
                     labelId="demo-simple-select-helper-label"
                     id="demo-simple-select-helper"
-                    value={selectedMenu?.menuCategories && selectedMenu.menuCategories[0]}
+                    value={
+                      selectedMenu?.menuCategories &&
+                      selectedMenu.menuCategories[0]
+                    }
                     label="Category"
                     onChange={handleDropdownChange}
                   >
-                    {
-                    categories &&
-                    categories.length > 0 && 
-                    categories.map((category: iCategoryDOM, key:number) => (
-                      <MenuItem value={category.value}>{category.label}</MenuItem>
-                    ))}
+                    {categories &&
+                      categories.length > 0 &&
+                      categories.map((category: iCategoryDOM, key: number) => (
+                        <MenuItem value={category.value}>
+                          {category.label}
+                        </MenuItem>
+                      ))}
                   </Select>
                 </FormControl>
                 <div
@@ -366,31 +375,33 @@ export default function MenuCard() {
                 }}
               >
                 <TextField
-                  value={selectedMenu?.price || ''}
+                  value={selectedMenu?.price || ""}
                   id="outlined-basic"
                   label="Price"
                   type="number"
                   variant="outlined"
                   name="price"
-                  onChange={(e) => handleChangeText('price', e.target.value)}
+                  onChange={(e) => handleChangeText("price", e.target.value)}
                 />
 
                 <TextField
-                  value={selectedMenu?.quantity || ''}
+                  value={selectedMenu?.quantity || ""}
                   id="outlined-basic"
                   label="Quantity"
                   type="number"
                   variant="outlined"
                   name="quantity"
-                  onChange={(e) => handleChangeText('quantity',e.target.value)}
+                  onChange={(e) => handleChangeText("quantity", e.target.value)}
                 />
                 <TextField
-                  value={selectedMenu?.cookingTime || ''}
+                  value={selectedMenu?.cookingTime || ""}
                   id="outlined-basic"
                   label="Cooking Time"
                   variant="outlined"
                   name="cookingTime"
-                  onChange={(e) => handleChangeText('cookingTime',e.target.value)}
+                  onChange={(e) =>
+                    handleChangeText("cookingTime", e.target.value)
+                  }
                 />
               </div>
               <div
@@ -404,7 +415,11 @@ export default function MenuCard() {
                 {selectedMenu.photo && (
                   <div>
                     <img
-                      src={typeof selectedMenu.photo === 'string' ? selectedMenu.photo : URL.createObjectURL(selectedMenu.photo)}
+                      src={
+                        typeof selectedMenu.photo === "string"
+                          ? selectedMenu.photo
+                          : URL.createObjectURL(selectedMenu.photo)
+                      }
                       alt="Selected"
                       width="150"
                       height="150"
@@ -443,7 +458,13 @@ export default function MenuCard() {
                 marginBottom: 2,
               }}
             >
-              <Image src={item.photo} width={200} height={100} alt="img" className={styles.menuImage} />
+              <Image
+                src={item.photo}
+                width={200}
+                height={100}
+                alt="img"
+                className={styles.menuImage}
+              />
               <CardContent>
                 <Typography gutterBottom variant="h6" component="div">
                   {item.title}
@@ -460,7 +481,8 @@ export default function MenuCard() {
                 >
                   Update
                 </button>
-                <button className={`${styles.updateBtn} ${styles.add_menu}`}
+                <button
+                  className={`${styles.updateBtn} ${styles.add_menu}`}
                   onClick={() => deleteConfirm(item._id)}
                 >
                   Delete

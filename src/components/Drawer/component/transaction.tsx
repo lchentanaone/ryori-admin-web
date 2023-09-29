@@ -54,6 +54,10 @@ export default function DailyTransaction() {
   };
   useEffect(() => {
     fetchEmpoyee();
+    const existingToken = localStorage.getItem("token");
+    if (!existingToken) {
+      window.location.href = "/admin/login";
+    }
   }, []);
 
   return (

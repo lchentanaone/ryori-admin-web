@@ -78,7 +78,7 @@ export default function TemporaryDrawer() {
           { text: "My Profile", href: "/admin/info" },
           { text: "Category", href: "/admin/categories" },
           { text: "Daily Transaction", href: "/admin/transaction" },
-          { text: "Archive Transaction", href: "/admin/archiveTrasaction" },
+          { text: "Archive Transaction", href: "/admin/archiveTransaction" },
           { text: "Inventory", href: "/admin/inventory" },
           { text: "Store Setting", href: "/admin/storeInfo" },
           { text: "QR Generator", href: "/admin/generateqr" },

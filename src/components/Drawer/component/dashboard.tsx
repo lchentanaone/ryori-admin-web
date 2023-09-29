@@ -105,6 +105,10 @@ const Dashboard = () => {
     fetchStoreData();
     fetchBranchData();
     fetchDashboard();
+    const existingToken = localStorage.getItem("token");
+    if (!existingToken) {
+      window.location.href = "/admin/login";
+    }
   }, []);
 
   // useEffect(() => {

@@ -19,6 +19,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import Swal from "sweetalert2";
 
 interface Category {
   _id: string;
@@ -224,6 +225,21 @@ export default function Inventory() {
     setQuantity(row.quantity);
   };
 
+  const deleteConfirm = async (_id: string) => {
+    const swalResponse = await Swal.fire({
+      title: "Delete Confirmation",
+      text: "Are you sure you want to delete this item?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel",
+      reverseButtons: true,
+    });
+    if (swalResponse.isConfirmed) {
+      deleteItem(_id);
+    }
+  };
+
   const deleteItem = async (_id: string) => {
     try {
       const token = localStorage.getItem("token");
@@ -274,14 +290,18 @@ export default function Inventory() {
   useEffect(() => {
     fetchCategory();
     fetchItems();
+    const existingToken = localStorage.getItem("token");
+    if (!existingToken) {
+      window.location.href = "/admin/login";
+    }
   }, []);
 
   return (
     <>
       <div style={{ marginTop: 10, paddingLeft: 50, paddingRight: 50 }}>
-        <h1>Inventory</h1>
+        <Typography variant="h5">Inventory</Typography>
         <div style={{ marginBottom: 15 }}>
-          <FormControl style={{ width: 200 }}>
+          <FormControl style={{ width: 200 }} size="small">
             <InputLabel id="demo-simple-select-helper-label">
               Category
             </InputLabel>
@@ -307,6 +327,7 @@ export default function Inventory() {
             variant="outlined"
             onChange={(e) => setItem(e.target.value)}
             style={{ marginLeft: 10, width: 350 }}
+            size="small"
           />
           <TextField
             value={weight}
@@ -315,6 +336,7 @@ export default function Inventory() {
             variant="outlined"
             onChange={(e) => setWeight(e.target.value)}
             style={{ marginLeft: 10 }}
+            size="small"
           />
           <TextField
             value={quantity}
@@ -324,6 +346,7 @@ export default function Inventory() {
             variant="outlined"
             onChange={(e) => setQuantity(e.target.value)}
             style={{ marginLeft: 10 }}
+            size="small"
           />
           <button onClick={addCategory} className={` ${styles.add_inventory}`}>
             Save
@@ -332,13 +355,12 @@ export default function Inventory() {
         {error !== "" && <div className="error_message">{error}</div>}
         {/* --- */}
         <div style={{ marginBottom: 10 }}>
-          <FormControl style={{ width: 200 }}>
-            <InputLabel style={{ marginTop: -5 }}>Filter by</InputLabel>
+          <FormControl style={{ width: 200 }} size="small">
+            <InputLabel>Filter by</InputLabel>
             <Select
               labelId="demo-simple-select-helper-label"
               id="demo-simple-select-helper"
               value={filter}
-              size="small"
               label="Category"
               onChange={handleFilter}
             >
@@ -354,7 +376,7 @@ export default function Inventory() {
           >
             <TableHead>
               <TableRow>
-                <TableCell>No.</TableCell>
+                <TableCell style={{ fontSize: "15px" }}>No.</TableCell>
                 <TableCell>Item</TableCell>
                 <TableCell>Weight</TableCell>
                 <TableCell>Qty</TableCell>
@@ -374,17 +396,23 @@ export default function Inventory() {
                     },
                   }}
                 >
-                  <TableCell component="th" scope="row">
+                  <TableCell style={{ fontSize: "12px" }}>
                     {index + 1}
                   </TableCell>
-                  <TableCell component="th" scope="row">
-                    {row.item}
+                  <TableCell style={{ fontSize: "12px" }}>{row.item}</TableCell>
+                  <TableCell style={{ fontSize: "12px" }}>
+                    {row.weight}
                   </TableCell>
-                  <TableCell>{row.weight}</TableCell>
-                  <TableCell>{row.quantity}</TableCell>
-                  <TableCell>{row.readyQty}</TableCell>
-                  <TableCell>{row.wasteQty}</TableCell>
-                  <TableCell>{row.date}</TableCell>
+                  <TableCell style={{ fontSize: "12px" }}>
+                    {row.quantity}
+                  </TableCell>
+                  <TableCell style={{ fontSize: "12px" }}>
+                    {row.readyQty}
+                  </TableCell>
+                  <TableCell style={{ fontSize: "12px" }}>
+                    {row.wasteQty}
+                  </TableCell>
+                  <TableCell style={{ fontSize: "12px" }}>{row.date}</TableCell>
                   <TableCell>
                     <IconButton
                       onClick={() => handleOpen(row._id)}
@@ -400,7 +428,7 @@ export default function Inventory() {
                     </IconButton>
                     <IconButton
                       aria-label="delete"
-                      onClick={() => deleteItem(row._id)}
+                      onClick={() => deleteConfirm(row._id)}
                     >
                       <DeleteIcon style={{ color: "red" }} />
                     </IconButton>
@@ -427,8 +455,8 @@ export default function Inventory() {
               }}
             >
               <h1>Inventory logs</h1>
-              <FormControl style={{ width: 200 }}>
-                <InputLabel style={{ marginTop: -5 }}>Type</InputLabel>
+              <FormControl style={{ width: 200 }} size="small">
+                <InputLabel>Type</InputLabel>
                 <Select
                   labelId="inventory-logs"
                   id="logs"
@@ -456,6 +484,7 @@ export default function Inventory() {
                   variant="outlined"
                   value={quantityLogs}
                   style={{ width: 100 }}
+                  size="small"
                   InputProps={{
                     readOnly: true,
                   }}

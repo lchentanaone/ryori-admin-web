@@ -14,7 +14,7 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import styles from "../component/style/menu.module.css";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
-
+import Swal from "sweetalert2";
 interface Categories {
   _id: string;
   title: string;
@@ -96,6 +96,21 @@ const MenuCategories = () => {
     }
   };
 
+  const deleteConfirm = async (_id: string) => {
+    const swalResponse = await Swal.fire({
+      title: "Delete Confirmation",
+      text: "Are you sure you want to delete this item?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel",
+      reverseButtons: true,
+    });
+    if (swalResponse.isConfirmed) {
+      deleteItem(_id);
+    }
+  };
+
   const deleteItem = async (_id: string) => {
     try {
       const token = localStorage.getItem("token");
@@ -118,10 +133,6 @@ const MenuCategories = () => {
       console.error(error);
     }
   };
-
-  useEffect(() => {
-    fetchItems();
-  }, []);
 
   const hiddenFileInput = useRef<HTMLInputElement | null>(null);
 
@@ -146,9 +157,17 @@ const MenuCategories = () => {
     }
   };
 
+  useEffect(() => {
+    fetchItems();
+    const existingToken = localStorage.getItem("token");
+    if (!existingToken) {
+      window.location.href = "/admin/login";
+    }
+  }, []);
+
   return (
     <Paper elevation={3} style={{ padding: "20px", height: "90vh" }}>
-      <Typography variant="h6">Menu Categories</Typography>
+      <Typography variant="subtitle1">Menu Categories</Typography>
       <div
         style={{
           flexDirection: "row",
@@ -169,8 +188,9 @@ const MenuCategories = () => {
             variant="outlined"
             margin="normal"
             value={title}
-            style={{ width: 350 }}
+            style={{ width: 300 }}
             onChange={(e) => setTitle(e.target.value)}
+            size="small"
           />
 
           <button
@@ -214,7 +234,7 @@ const MenuCategories = () => {
         </div>
       </div>
 
-      <div style={{ maxHeight: "580px", overflowY: "auto" }}>
+      <div style={{ maxHeight: "380px", overflowY: "auto" }}>
         <TableContainer style={{ flex: 1 }}>
           <Table>
             <TableHead>
@@ -226,7 +246,9 @@ const MenuCategories = () => {
             {category.map((item, index) => (
               <TableBody key={index}>
                 <TableRow>
-                  <TableCell>{item.title}</TableCell>
+                  <TableCell style={{ fontSize: "12px" }}>
+                    {item.title}
+                  </TableCell>
                   <TableCell>
                     <IconButton
                       onClick={() => handleEdit(item)}
@@ -235,7 +257,7 @@ const MenuCategories = () => {
                       <BorderColorIcon />
                     </IconButton>
                     <IconButton
-                      onClick={() => deleteItem(item._id)}
+                      onClick={() => deleteConfirm(item._id)}
                       aria-label="delete"
                     >
                       <DeleteIcon style={{ color: "red" }} />

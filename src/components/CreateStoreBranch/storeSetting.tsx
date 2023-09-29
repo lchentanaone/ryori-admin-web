@@ -150,19 +150,15 @@ const StoreInfo: React.FC = () => {
 
   useEffect(() => {
     fetchStoreData();
+    const existingToken = localStorage.getItem("token");
+    if (!existingToken) {
+      window.location.href = "/admin/login";
+    }
   }, []);
 
   return (
     <Grid container justifyContent="center" alignItems="center" height="100vh">
-      <Paper
-        elevation={3}
-        style={{
-          padding: "20px",
-          width: 800,
-          paddingTop: "50px",
-          paddingBottom: "50px",
-        }}
-      >
+      <Paper elevation={3} style={{ padding: "20px", width: 800 }}>
         {storeData ? (
           <>
             <Grid
@@ -182,7 +178,7 @@ const StoreInfo: React.FC = () => {
                   textAlign: "center",
                 }}
               >
-                <Typography variant="h6" style={{ marginBottom: 20 }}>
+                <Typography variant="h6" style={{ marginTop: 10 }}>
                   {isEditing ? "Update Store" : "Store Details"}
                 </Typography>
                 <div>
@@ -220,7 +216,7 @@ const StoreInfo: React.FC = () => {
                 </div>
               </div>
               <div>
-                <Grid container spacing={2} style={{ marginTop: 20 }}>
+                <Grid container spacing={2} style={{ marginTop: 2 }}>
                   <Grid item xs={12}>
                     <TextField
                       label="Store Name"
