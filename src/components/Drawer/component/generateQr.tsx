@@ -68,7 +68,7 @@ const QRGenerator = () => {
           <Typography variant="h5">Generate Table QR Code here</Typography>
           <Grid item xs={12} textAlign="center">
             {qrString && (
-              <Image
+              <img
                 width={300}
                 height={300}
                 alt="QR Code"
