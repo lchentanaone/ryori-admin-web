@@ -63,6 +63,7 @@ export default function MenuCard() {
   const handleClose = () => {
     setOpen(false);
     setSelectedMenu("");
+    setErrors("");
   };
   const [photo, setPhoto] = useState(null);
 
@@ -261,6 +262,13 @@ export default function MenuCard() {
     const menuItemId = await handleAddMenu();
     fetchMenu();
     handleClose();
+    setErrors("");
+    setTitle("");
+    setDescription("");
+    setPhoto(null);
+    setPrice("");
+    setQty(0);
+    setCookingTime("");
   };
 
   useEffect(() => {
@@ -343,6 +351,7 @@ export default function MenuCard() {
                       ))}
                   </Select>
                 </FormControl>
+                {errors !== "" && <p style={{ color: "#ff0000" }}>{errors}</p>}
                 <div
                   style={{
                     display: "flex",
