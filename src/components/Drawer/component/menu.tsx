@@ -62,7 +62,7 @@ export default function MenuCard() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
-    setSelectedMenu("");
+    setSelectedMenu({ _id: "-1" });
     setErrors("");
   };
   const [photo, setPhoto] = useState(null);
